@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Capstone.Models;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +22,39 @@ namespace Capstone.DAL
         /// Returns all parks
         /// </summary>
         /// <returns></returns>
+        public IDictionary<int, Park> GetParks()
+        {
+            Dictionary<int, Park> availableParks = new Dictionary<int, Park>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand("SELECT * FROM park", conn);
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Park p = new Park();
+                        p.Park_Id = Convert.ToInt32(reader["park_id"]);
+                        p.Name = Convert.ToString(reader["name"]);
+                        p.Location = Convert.ToString(reader["location"]);
+                        p.EstablishDate = Convert.ToDateTime(reader["establish_date"]);
+                        p.Area = Convert.ToInt32(reader["area"]);
+                        p.Visitors = Convert.ToInt32(reader["visitors"]);
+                        p.Description = Convert.ToString(reader["description"]);
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return availableParks;
+        }
 
 
         
