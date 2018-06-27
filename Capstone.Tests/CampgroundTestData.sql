@@ -33,7 +33,8 @@ INSERT INTO site (site_id, campground_id, site_number, max_occupancy, accessible
 INSERT INTO site (site_id, campground_id, site_number, max_occupancy, accessible, max_rv_length, utilities) VALUES (8, 6, 1, 6, 0, 0, 1);
 SET IDENTITY_INSERT site OFF;
 
--- Insert project_employees
-INSERT INTO project_employee VALUES (1, 1);
-INSERT INTO project_employee VALUES (1, 2);
-INSERT INTO project_employee VALUES (2, 1);
+-- Insert reservations
+SET IDENTITY_INSERT reservation ON;
+INSERT INTO reservation (reservation_id, site_id, name, from_date, to_date, create_date) VALUES (1, 1, 'Stark Family Reservation', '2018-07-22', '2018-07-26', '2018-06-26');
+INSERT INTO reservation (reservation_id, site_id, name, from_date, to_date, create_date) VALUES (2, 2, 'Targaryen Family Reservation', '2018-08-11', '2018-08-14', '2018-06-27');
+SET IDENTITY_INSERT reservation OFF;

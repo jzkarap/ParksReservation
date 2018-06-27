@@ -14,7 +14,7 @@ namespace Capstone.Tests
     [TestClass]
     public class CapstoneDBTests
     {
-        public const string ConnectionString = @"Data Source=.\SQLExpress;Initial Catalog = CampgroundDB; Integrated Security = True";
+        public const string ConnectionString = @"Data Source=.\SQLExpress;Initial Catalog = Campground; Integrated Security = True";
 
         TransactionScope transaction;
 
@@ -24,7 +24,7 @@ namespace Capstone.Tests
             transaction = new TransactionScope();
 
             // Read sql from text file
-            string sql = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, ""));
+            string sql = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "CampgroundTestData.sql"));
 
             // Run sql
             using (SqlConnection conn = new SqlConnection(ConnectionString))
