@@ -12,6 +12,8 @@ namespace Capstone.DAL
     {
         private string connectionString;
 
+        private Dictionary<int, Park> availableParks = new Dictionary<int, Park>();
+
         // Single parameter constructor
         public ParkSqlDAL(string dbConnectionString)
         {
@@ -24,8 +26,6 @@ namespace Capstone.DAL
         /// <returns></returns>
         public IDictionary<int, Park> GetParks()
         {
-            Dictionary<int, Park> availableParks = new Dictionary<int, Park>();
-
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -50,7 +50,7 @@ namespace Capstone.DAL
 
                         availableParks.Add(parkSelection, p);
 
-                       parkSelection = parkSelection++;
+                        parkSelection = parkSelection + 1;
                     }
                 }
             }
@@ -62,24 +62,27 @@ namespace Capstone.DAL
             return availableParks;
         }
 
+        public void GetParkToDisplay(int parkToDisplay)
+        {
 
-        
-        /// <summary>
-        /// Display all Parks to the user
-        /// </summary>
-        //public void DisplayParkInformation()
-        //{
-        //    // TODO : store parksList[i] as park
-        //    Console.WriteLine("Park Information Screen");
-        //    Console.WriteLine(parksList[i].Name);
-        //    Console.WriteLine(parksList[i].Location);
-        //    Console.WriteLine(parksList[i].EstablishedDate);
-        //    Console.WriteLine(parksList[i].Area);
-        //    Console.WriteLine(parksList[i].AnnualVisitorCount);
-        //    Console.WriteLine();
-        //    Console.WriteLine(parksList[i].Description);
-        //    Console.WriteLine();
-        //}
+            if (availableParks.ContainsKey(parkToDisplay))
+            {
+                Park parkSelected = availableParks[parkToDisplay];
 
+                Console.Clear();
+                Console.WriteLine("Park Information Screen");
+                Console.WriteLine($"{parkSelected.Name}");
+                Console.WriteLine("Location:".PadRight(20) + $"{parkSelected.Location}");
+                Console.WriteLine("Established:".PadRight(20) + $"{parkSelected.EstablishDate.ToString("MM/dd/yyyy")}");
+                Console.WriteLine("Area:".PadRight(20) + $"{parkSelected.Area} sq km");
+                Console.WriteLine("Annual Visitors:".PadRight(20) + $"{parkSelected.Visitors}");
+                Console.WriteLine();
+                Console.WriteLine($"{parkSelected.Description}");
+            }
+            else
+            {
+                Console.WriteLine("**** NO RESULTS ****");
+            }
+        }
     }
 }

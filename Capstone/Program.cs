@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Capstone
@@ -11,7 +12,10 @@ namespace Capstone
     {
         static void Main(string[] args)
         {
-            
+            CampgroundCLI cli = new CampgroundCLI();
+            cli.PrintHeader();
+            Thread.Sleep(800);
+            cli.DisplayAvailableParks();
         }
     }
 }
