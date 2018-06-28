@@ -73,7 +73,7 @@ namespace Capstone
         }
 
 
-        public void PresentCampgroundsByPark()
+        private void GetCampgroundsByPark()
         {
             int parkForCampgrounds = parksAvailable[parkToDisplay].ParkID;
             string parkName = parksAvailable[parkToDisplay].Name;
@@ -86,6 +86,13 @@ namespace Capstone
             Console.WriteLine(parkName);
             Console.WriteLine();
 
+            PresentCampgroundInfo(campgrounds);
+   
+            Console.WriteLine();
+        }
+
+        private void PresentCampgroundInfo(IList<Campground> campgrounds)
+        {
             Console.WriteLine("Name".PadLeft(10).PadRight(40) + "Open".PadRight(10) + "Close".PadRight(10) + "Daily Fee");
 
             for (int i = 0; i < campgrounds.Count; i++)
@@ -99,11 +106,9 @@ namespace Capstone
                 double dailyFee = campgrounds[i].DailyFee;
 
                 // EXPAND INFO
-                Console.WriteLine($"{campID}".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(10) + $"{dailyFee}");
+                Console.WriteLine($"#{campID}".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(10) + $"{dailyFee}");
 
             }
-
-            Console.WriteLine();
         }
 
         public void PresentParkInfo(Park selectedPark)
@@ -120,7 +125,7 @@ namespace Capstone
         /// <summary>
         /// Displays a list of parks available for selection
         /// </summary>
-        public void DisplayAvailableParks()
+        private void DisplayAvailableParks()
         {
             Console.WriteLine("View Parks Interface");
 
@@ -132,21 +137,7 @@ namespace Capstone
             {
                 try
                 {
-                    Console.WriteLine("Select a Park for Further Details:");
-
-                    // Displays parks contained within parksAvailable
-                    for (var i = 0; i < parksAvailable.Count; i++)
-                    {
-                        int listEntryNumber = i + 1;
-                        string parkName = parksAvailable[i].Name;
-
-                        Console.WriteLine($"{listEntryNumber}) {parkName}");
-
-                        validOptions.Add(listEntryNumber);
-                    }
-
-                    Console.WriteLine("Q) Quit");
-                    Console.WriteLine();
+                    PrintParkMenu(validOptions);
 
                     userChoice = Console.ReadLine().ToUpper();
 
@@ -186,21 +177,16 @@ namespace Capstone
             }
         }
 
-        public void DisplayCampgrounds()
+        private void DisplayCampgrounds()
         {
             const string getCampgrounds = "1";
             const string searchForReservations = "2";
             const string returnToParks = "3";
 
-  
+
 
             bool getUsOutTheLoop = true;
-
-            Console.WriteLine();
-            Console.WriteLine("Select a Command");
-            Console.WriteLine("1) View Campgrounds".PadLeft(4));
-            Console.WriteLine("2) Search for Reservation".PadLeft(4));
-            Console.WriteLine("3) Return to Previous Screen".PadLeft(4));
+            CampgroundsCommandMenu();
 
             while (getUsOutTheLoop == true)
             {
@@ -209,7 +195,7 @@ namespace Capstone
                 switch (command.ToLower())
                 {
                     case getCampgrounds:
-                        PresentCampgroundsByPark();
+                        GetCampgroundsByPark();
                         getUsOutTheLoop = false;
                         break;
 
@@ -228,12 +214,35 @@ namespace Capstone
             }
         }
 
-        private void PrintParkMenu()
+        private static void CampgroundsCommandMenu()
         {
-
+            Console.WriteLine();
+            Console.WriteLine("Select a Command");
+            Console.WriteLine("1) View Campgrounds".PadLeft(4));
+            Console.WriteLine("2) Search for Reservation".PadLeft(4));
+            Console.WriteLine("3) Return to Previous Screen".PadLeft(4));
         }
 
-        public void PrintHeader()
+        private void PrintParkMenu(List<int> validOptions)
+        {
+            Console.WriteLine("Select a Park for Further Details:");
+
+            // Displays parks contained within parksAvailable
+            for (var i = 0; i < parksAvailable.Count; i++)
+            {
+                int listEntryNumber = i + 1;
+                string parkName = parksAvailable[i].Name;
+
+                Console.WriteLine($"{listEntryNumber}) {parkName}");
+
+                validOptions.Add(listEntryNumber);
+            }
+
+            Console.WriteLine("Q) Quit");
+            Console.WriteLine();
+        }
+
+        private void PrintHeader()
         {
             Console.WriteLine("Welcome to the National Parks Reservation system!");
             Console.WriteLine();
