@@ -9,326 +9,341 @@ using System.Threading.Tasks;
 
 namespace Capstone
 {
-    public class CLI
-    {
-        const string DatabaseConnection = @"Data Source=.\SQLExpress;Initial Catalog=Campground;Integrated Security=True";
+	public class CLI
+	{
+		const string DatabaseConnection = @"Data Source=.\SQLExpress;Initial Catalog=Campground;Integrated Security=True";
 
-        int parkToDisplay = 0;
+		/// <summary>
+		/// User selected park, available through class
+		/// </summary>
+		static int parkToDisplay;
 
-        // Gets list parksAvailable from parkDAL
-        static Park_DAL parkDAL = new Park_DAL();
-        IList<Park> parksAvailable = parkDAL.GetParks();
+		// Gets list parksAvailable from parkDAL
+		static Park_DAL parkDAL = new Park_DAL();
+		static IList<Park> parksAvailable = parkDAL.GetParks();
+
+		static Park selectedPark;
 
 		/// <summary>
 		/// Initiates CLI
 		/// </summary>
-        public void RunCLI()
-        {
-            PrintHeader();
-            Thread.Sleep(800);
+		public void RunCLI()
+		{
+			PrintHeader();
+			Thread.Sleep(800);
 
-            DisplayAvailableParks();
-        }
+			DisplayAvailableParks();
+		}
 
 		/// <summary>
 		/// Prints program greeting
 		/// </summary>
-        private void PrintHeader()
-        {
-            Console.WriteLine("Welcome to the National Parks Reservation system!");
-            Console.WriteLine();
-        }
+		private void PrintHeader()
+		{
+			Console.WriteLine("Welcome to the National Parks Reservation system!");
+			Console.WriteLine();
+		}
 
-        /// <summary>
-        /// Generates list of valid park choices, presents park selection screen
-        /// </summary>
-        private void DisplayAvailableParks()
-        {
-            Console.WriteLine("View Parks Interface");
+		/// <summary>
+		/// Generates list of valid park choices, presents park selection screen
+		/// </summary>
+		private void DisplayAvailableParks()
+		{
+			Console.WriteLine("View Parks Interface");
 
-            string userChoice = "";
+			string userChoice = "";
 
-            List<int> validOptions = new List<int>();
+			List<int> validOptions = new List<int>();
 
-            while (!validOptions.Contains(parkToDisplay))
-            {
-                try
-                {
-                    PrintParkSelection(validOptions);
+			// Sets parkToDisplay to 0 so choice can be reselected by user through menu regression
+			parkToDisplay = 0;
 
-                    userChoice = Console.ReadLine().ToUpper();
+			while (!validOptions.Contains(parkToDisplay))
+			{
+				try
+				{
+					PrintParkSelection(validOptions);
 
-                    Console.Clear();
+					userChoice = Console.ReadLine().ToUpper();
 
-                    if (userChoice == "Q")
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Goodbye!");
-                        Console.WriteLine();
+					Console.Clear();
 
-                        return;
-                    }
-                    else
-                    {
-                        // Gets index of park from parksAvailable by subtracting 1 from the user's choice
-                        // (to account for 0-based index)
-                        parkToDisplay = (int.Parse(userChoice) - 1);
+					if (userChoice == "Q")
+					{
+						Console.Clear();
+						Console.WriteLine("Goodbye!");
+						Console.WriteLine();
 
-                        Park selectedPark = parksAvailable[parkToDisplay];
+						return;
+					}
+					else
+					{
+						// Gets index of park from parksAvailable by subtracting 1 from the user's choice
+						// (to account for 0-based index)
+						parkToDisplay = (int.Parse(userChoice) - 1);
 
-                        PresentParkInfo(selectedPark);
+						selectedPark = parksAvailable[parkToDisplay];
 
-                        Console.WriteLine();
+						PresentParkInfo(selectedPark);
 
-                        ParkSubmenuSelection();
+						Console.WriteLine();
 
-                        return;
-                    }
-                }
-                catch (Exception)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Please select a valid park!");
-                    Console.WriteLine();
-                }
-            }
-        }
+						return;
+					}
+				}
+				catch (Exception)
+				{
+					Console.Clear();
+					Console.WriteLine("Please select a valid park!");
+					Console.WriteLine();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Prints each park in numbered park list
 		/// </summary>
 		/// <param name="validOptions">Accepts only selections within range of possible choices</param>
-        private void PrintParkSelection(List<int> validOptions)
-        {
-            Console.WriteLine("Select a Park for Further Details:");
+		private void PrintParkSelection(List<int> validOptions)
+		{
+			Console.WriteLine("Select a Park for Further Details:");
 
-            // Displays parks contained within parksAvailable
-            for (var i = 0; i < parksAvailable.Count; i++)
-            {
-                int listEntryNumber = i + 1;
-                string parkName = parksAvailable[i].Name;
+			// Displays parks contained within parksAvailable
+			for (var i = 0; i < parksAvailable.Count; i++)
+			{
+				int listEntryNumber = i + 1;
+				string parkName = parksAvailable[i].Name;
 
-                Console.WriteLine($"   {listEntryNumber}) {parkName}");
+				Console.WriteLine($"   {listEntryNumber}) {parkName}");
 
-                validOptions.Add(listEntryNumber);
-            }
+				validOptions.Add(listEntryNumber);
+			}
 
-            Console.WriteLine("   Q) Quit");
-            Console.WriteLine();
-        }
+			Console.WriteLine("   Q) Quit");
+			Console.WriteLine();
+		}
 
 		/// <summary>
 		///  Generates information about a specific park
 		/// </summary>
 		/// <param name="selectedPark">The user-selected park</param>
-        private void PresentParkInfo(Park selectedPark)
-        {
-            Console.WriteLine($"{selectedPark.Name}");
-            Console.WriteLine("Location".PadRight(20) + $"{selectedPark.Location}");
-            Console.WriteLine("Established".PadRight(20) + $"{selectedPark.DateEstablished.ToString("dd/MM/yyyy")}");
-            Console.WriteLine("Area".PadRight(20) + $"{selectedPark.AreaInKmSquared} sq km");
-            Console.WriteLine("Annual Visitors".PadRight(20) + $"{selectedPark.AnnualVisitorCount}");
-            Console.WriteLine();
-            Console.WriteLine($"{selectedPark.Description}");
-        }
+		private void PresentParkInfo(Park selectedPark)
+		{
+			Console.Clear();
+			Console.WriteLine($"{selectedPark.Name}");
+			Console.WriteLine("Location".PadRight(20) + $"{selectedPark.Location}");
+			Console.WriteLine("Established".PadRight(20) + $"{selectedPark.DateEstablished.ToString("dd/MM/yyyy")}");
+			Console.WriteLine("Area".PadRight(20) + $"{selectedPark.AreaInKmSquared} sq km");
+			Console.WriteLine("Annual Visitors".PadRight(20) + $"{selectedPark.AnnualVisitorCount}");
+			Console.WriteLine();
+			Console.WriteLine($"{selectedPark.Description}");
+
+			ParkSubmenuSelection();
+		}
 
 		/// <summary>
 		/// Gets user selection for options while park info is displayed
 		/// </summary>
-        private void ParkSubmenuSelection()
-        {
-            const string getCampgrounds = "1";
-            const string searchForReservations = "2";
-            const string returnToParks = "3";
+		private void ParkSubmenuSelection()
+		{
+			const string getCampgrounds = "1";
+			const string searchForReservations = "2";
+			const string returnToParks = "3";
 
-            bool getUsOutTheLoop = true;
-            CampgroundCommandMenu();
+			bool getUsOutTheLoop = true;
+			CampgroundCommandMenu();
 
-            while (getUsOutTheLoop == true)
-            {
-                string command = GetUserInputString();
+			while (getUsOutTheLoop == true)
+			{
+				string command = GetUserInputString();
 
-                switch (command.ToLower())
-                {
-                    case getCampgrounds:
-                        GetCampgroundsByPark();
-                        getUsOutTheLoop = false;
-                        break;
+				switch (command.ToLower())
+				{
+					case getCampgrounds:
+						GetCampgroundsByPark();
+						getUsOutTheLoop = false;
+						break;
 
-                    case searchForReservations:
-                        //reservationDAL.GetAvailableReservations();
-                        getUsOutTheLoop = false;
-                        break;
+					case searchForReservations:
+						//reservationDAL.GetAvailableReservations();
+						getUsOutTheLoop = false;
+						break;
 
-                    case returnToParks:
-                        Console.Clear();
-                        DisplayAvailableParks();
-                        getUsOutTheLoop = false;
-                        break;
-                }
+					case returnToParks:
+						Console.Clear();
+						DisplayAvailableParks();
+						getUsOutTheLoop = false;
+						break;
+				}
 
-            }
-        }
+			}
+		}
 
 		/// <summary>
 		/// Creates list of campgrounds within park selected by user
 		/// </summary>
-        private void GetCampgroundsByPark()
-        {
-            int parkForCampgrounds = parksAvailable[parkToDisplay].ParkID;
-            string parkName = parksAvailable[parkToDisplay].Name;
+		private void GetCampgroundsByPark()
+		{
+			int parkForCampgrounds = parksAvailable[parkToDisplay].ParkID;
+			string parkName = parksAvailable[parkToDisplay].Name;
 
-            Campground_DAL campDAL = new Campground_DAL();
+			Campground_DAL campDAL = new Campground_DAL();
 
-            IList<Campground> campgrounds = campDAL.GetCampgroundsByPark(parkForCampgrounds);
+			IList<Campground> campgrounds = campDAL.GetCampgroundsByPark(parkForCampgrounds);
 
-            Console.Clear();
-            Console.WriteLine("Park Campgrounds");
-            Console.WriteLine(parkName);
-            Console.WriteLine();
+			Console.Clear();
+			Console.WriteLine("Park Campgrounds");
+			Console.WriteLine(parkName);
+			Console.WriteLine();
 
-            PresentCampgroundInfo(campgrounds);
+			PresentCampgroundInfo(campgrounds);
 
-            CampgroundSubMenu();
-            CampsiteCommands(GetUserInputString());
+			CampgroundSubMenu();
+			CampsiteCommands(GetUserInputString());
 
-            Console.WriteLine();
-        }
+			Console.WriteLine();
+		}
 
 		/// <summary>
 		/// Goes through list of camgpgrounds, printing relevant info to console
 		/// </summary>
 		/// <param name="campgrounds"></param>
-        private void PresentCampgroundInfo(IList<Campground> campgrounds)
-        {
-            Console.WriteLine("Name".PadLeft(10).PadRight(40) + "Open".PadRight(10) + "Close".PadRight(15) + "Daily Fee");
+		private void PresentCampgroundInfo(IList<Campground> campgrounds)
+		{
+			Console.WriteLine("Name".PadLeft(10).PadRight(40) + "Open".PadRight(10) + "Close".PadRight(15) + "Daily Fee");
 
-            for (int i = 0; i < campgrounds.Count; i++)
-            {
-                Campground c = campgrounds[i];
+			for (int i = 0; i < campgrounds.Count; i++)
+			{
+				Campground c = campgrounds[i];
 
-                int campID = campgrounds[i].CampID;
-                string campground = campgrounds[i].Name;
-                string firstMonth = GetMonthFromSQLInt(c.FirstMonthOpen);
-                string lastMonth = GetMonthFromSQLInt(c.LastMonthOpen);
-                double dailyFee = campgrounds[i].DailyFee;
+				int campID = campgrounds[i].CampID;
+				string campground = campgrounds[i].Name;
+				string firstMonth = GetMonthFromSQLInt(c.FirstMonthOpen);
+				string lastMonth = GetMonthFromSQLInt(c.LastMonthOpen);
+				double dailyFee = campgrounds[i].DailyFee;
 
-                Console.WriteLine($"#{campID}".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(15) + $"{dailyFee:C2}");
+				Console.WriteLine($"#{campID}".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(15) + $"{dailyFee:C2}");
 
-            }
-        }
+			}
+		}
 
 		/// <summary>
 		/// Prints campground options to screen
 		/// </summary>
-        private static void CampgroundCommandMenu()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Select a Command");
-            Console.WriteLine("   1) View Campgrounds".PadLeft(4));
-            Console.WriteLine("   2) Search for Reservation".PadLeft(4));
-            Console.WriteLine("   3) Return to Previous Screen".PadLeft(4));
-        }
+		private static void CampgroundCommandMenu()
+		{
+			Console.WriteLine();
+			Console.WriteLine("Select a Command");
+			Console.WriteLine("   1) View Campgrounds".PadLeft(4));
+			Console.WriteLine("   2) Search for Reservation".PadLeft(4));
+			Console.WriteLine("   3) Return to Previous Screen".PadLeft(4));
+		}
 
 		/// <summary>
 		/// Prints submenu when campgrounds are displayed
 		/// </summary>
-        private void CampgroundSubMenu()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Select a Command: ");
-            Console.WriteLine("   1) Search for Available Reservation");
-            Console.WriteLine("   2) Return to Previous Screen");
-        }
+		private void CampgroundSubMenu()
+		{
+			Console.WriteLine();
+			Console.WriteLine("Select a Command: ");
+			Console.WriteLine("   1) Search for Available Reservation");
+			Console.WriteLine("   2) Return to Previous Screen");
+		}
 
 		/// <summary>
 		/// Gets user selection for campsite options
 		/// </summary>
 		/// <param name="userInput">user input 1 or 2</param>
-        private void CampsiteCommands(string userInput)
-        {
-            Console.WriteLine();
+		private void CampsiteCommands(string userInput)
+		{
+			Console.WriteLine();
 
 			while (userInput != "1" ||
-                    userInput != "2")
-            {
-                switch (userInput)
-                {
-                    case "1":
-                       // SearchForReservations();
-                        return;
+					userInput != "2")
+			{
+				switch (userInput)
+				{
+					case "1":
+						// SearchForReservations();
+						return;
 
-                    case "2":
-                        return;
-                }
+					case "2":
+						PresentParkInfo(selectedPark);
+						return;
+				}
 
 				Console.WriteLine("Please select a valid option!");
 				Thread.Sleep(1000);
 				ClearCurrentConsoleLine();
 				userInput = GetUserInputString();
-            }
-        }
+			}
+		}
+
+
+
+
+
 
 		/// <summary>
 		/// Translates SQL data to month as string
 		/// </summary>
 		/// <param name="month">integer value from SQL, representing month</param>
 		/// <returns>month as string</returns>
-        private string GetMonthFromSQLInt(int month)
-        {
-            switch (month)
-            {
-                case 1:
-                    return "January";
+		private string GetMonthFromSQLInt(int month)
+		{
+			switch (month)
+			{
+				case 1:
+					return "January";
 
-                case 2:
-                    return "February";
+				case 2:
+					return "February";
 
-                case 3:
-                    return "March";
+				case 3:
+					return "March";
 
-                case 4:
-                    return "April";
+				case 4:
+					return "April";
 
-                case 5:
-                    return "May";
+				case 5:
+					return "May";
 
-                case 6:
-                    return "June";
+				case 6:
+					return "June";
 
-                case 7:
-                    return "July";
+				case 7:
+					return "July";
 
-                case 8:
-                    return "August";
+				case 8:
+					return "August";
 
-                case 9:
-                    return "September";
+				case 9:
+					return "September";
 
-                case 10:
-                    return "October";
+				case 10:
+					return "October";
 
-                case 11:
-                    return "November";
+				case 11:
+					return "November";
 
-                case 12:
-                    return "December";
+				case 12:
+					return "December";
 
-                default:
-                    return "N/A";
-            }
-        }
+				default:
+					return "N/A";
+			}
+		}
 
 		/// <summary>
 		/// Gets user input
 		/// </summary>
 		/// <returns>String representing user input</returns>
-        private string GetUserInputString()
-        {
+		private string GetUserInputString()
+		{
 			string userInput = Console.ReadLine();
 			ClearCurrentConsoleLine();
 			return userInput;
-			
+
 		}
 
 		// Sets cursor to beginning of line and rewrites line
