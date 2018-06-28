@@ -19,6 +19,9 @@ namespace Capstone
         static Park_DAL parkDAL = new Park_DAL();
         IList<Park> parksAvailable = parkDAL.GetParks();
 
+		/// <summary>
+		/// Initiates CLI
+		/// </summary>
         public void RunCLI()
         {
             PrintHeader();
@@ -27,6 +30,9 @@ namespace Capstone
             DisplayAvailableParks();
         }
 
+		/// <summary>
+		/// Prints program greeting
+		/// </summary>
         private void PrintHeader()
         {
             Console.WriteLine("Welcome to the National Parks Reservation system!");
@@ -34,7 +40,7 @@ namespace Capstone
         }
 
         /// <summary>
-        /// Displays a list of parks available for selection
+        /// Generates list of valid park choices, presents park selection screen
         /// </summary>
         private void DisplayAvailableParks()
         {
@@ -48,7 +54,7 @@ namespace Capstone
             {
                 try
                 {
-                    PrintParkMenu(validOptions);
+                    PrintParkSelection(validOptions);
 
                     userChoice = Console.ReadLine().ToUpper();
 
@@ -74,7 +80,7 @@ namespace Capstone
 
                         Console.WriteLine();
 
-                        DisplayCampgrounds();
+                        ParkSubmenuSelection();
 
                         return;
                     }
@@ -88,7 +94,11 @@ namespace Capstone
             }
         }
 
-        private void PrintParkMenu(List<int> validOptions)
+		/// <summary>
+		/// Prints each park in numbered park list
+		/// </summary>
+		/// <param name="validOptions">Accepts only selections within range of possible choices</param>
+        private void PrintParkSelection(List<int> validOptions)
         {
             Console.WriteLine("Select a Park for Further Details:");
 
@@ -107,6 +117,10 @@ namespace Capstone
             Console.WriteLine();
         }
 
+		/// <summary>
+		///  Generates information about a specific park
+		/// </summary>
+		/// <param name="selectedPark">The user-selected park</param>
         private void PresentParkInfo(Park selectedPark)
         {
             Console.WriteLine($"{selectedPark.Name}");
@@ -118,14 +132,17 @@ namespace Capstone
             Console.WriteLine($"{selectedPark.Description}");
         }
 
-        private void DisplayCampgrounds()
+		/// <summary>
+		/// Gets user selection for options while park info is displayed
+		/// </summary>
+        private void ParkSubmenuSelection()
         {
             const string getCampgrounds = "1";
             const string searchForReservations = "2";
             const string returnToParks = "3";
 
             bool getUsOutTheLoop = true;
-            CampgroundsCommandMenu();
+            CampgroundCommandMenu();
 
             while (getUsOutTheLoop == true)
             {
@@ -153,6 +170,9 @@ namespace Capstone
             }
         }
 
+		/// <summary>
+		/// Creates list of campgrounds within park selected by user
+		/// </summary>
         private void GetCampgroundsByPark()
         {
             int parkForCampgrounds = parksAvailable[parkToDisplay].ParkID;
@@ -175,6 +195,10 @@ namespace Capstone
             Console.WriteLine();
         }
 
+		/// <summary>
+		/// Goes through list of camgpgrounds, printing relevant info to console
+		/// </summary>
+		/// <param name="campgrounds"></param>
         private void PresentCampgroundInfo(IList<Campground> campgrounds)
         {
             Console.WriteLine("Name".PadLeft(10).PadRight(40) + "Open".PadRight(10) + "Close".PadRight(15) + "Daily Fee");
@@ -189,12 +213,26 @@ namespace Capstone
                 string lastMonth = GetMonthFromSQLInt(c.LastMonthOpen);
                 double dailyFee = campgrounds[i].DailyFee;
 
-                // EXPAND INFO
                 Console.WriteLine($"#{campID}".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(15) + $"{dailyFee:C2}");
 
             }
         }
 
+		/// <summary>
+		/// Prints campground options to screen
+		/// </summary>
+        private static void CampgroundCommandMenu()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Select a Command");
+            Console.WriteLine("   1) View Campgrounds".PadLeft(4));
+            Console.WriteLine("   2) Search for Reservation".PadLeft(4));
+            Console.WriteLine("   3) Return to Previous Screen".PadLeft(4));
+        }
+
+		/// <summary>
+		/// Prints submenu when campgrounds are displayed
+		/// </summary>
         private void CampgroundSubMenu()
         {
             Console.WriteLine();
@@ -203,11 +241,15 @@ namespace Capstone
             Console.WriteLine("   2) Return to Previous Screen");
         }
 
+		/// <summary>
+		/// Gets user selection for campsite options
+		/// </summary>
+		/// <param name="userInput">user input 1 or 2</param>
         private void CampsiteCommands(string userInput)
         {
             Console.WriteLine();
 
-            while (userInput != "1" ||
+			while (userInput != "1" ||
                     userInput != "2")
             {
                 switch (userInput)
@@ -220,20 +262,18 @@ namespace Capstone
                         return;
                 }
 
-                userInput = GetUserInputString();
+				Console.WriteLine("Please select a valid option!");
+				Thread.Sleep(1000);
+				ClearCurrentConsoleLine();
+				userInput = GetUserInputString();
             }
-
         }
 
-        private static void CampgroundsCommandMenu()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Select a Command");
-            Console.WriteLine("   1) View Campgrounds".PadLeft(4));
-            Console.WriteLine("   2) Search for Reservation".PadLeft(4));
-            Console.WriteLine("   3) Return to Previous Screen".PadLeft(4));
-        }
-
+		/// <summary>
+		/// Translates SQL data to month as string
+		/// </summary>
+		/// <param name="month">integer value from SQL, representing month</param>
+		/// <returns>month as string</returns>
         private string GetMonthFromSQLInt(int month)
         {
             switch (month)
@@ -279,25 +319,25 @@ namespace Capstone
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+		/// <summary>
+		/// Gets user input
+		/// </summary>
+		/// <returns>String representing user input</returns>
         private string GetUserInputString()
         {
-            string userInput = Console.ReadLine();
-            return userInput;
-        }
-    }
+			string userInput = Console.ReadLine();
+			ClearCurrentConsoleLine();
+			return userInput;
+			
+		}
 
-
+		// Sets cursor to beginning of line and rewrites line
+		// This allows input field to be reset without bumping down to new line
+		private void ClearCurrentConsoleLine()
+		{
+			Console.SetCursorPosition(0, Console.CursorTop - 1);
+			Console.Write(new string(' ', Console.WindowWidth));
+			Console.SetCursorPosition(0, Console.CursorTop - 1);
+		}
+	}
 }
