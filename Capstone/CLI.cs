@@ -282,16 +282,18 @@ namespace Capstone
 			}
 		}
 
-		private void SearchForAvailableCampsites()
+		private void SearchForAvailableCampsites(Campground selectedCampground)
 		{
-			List<Campsite> campsites = campgrounds.GetCampsitesByCampground(notherList[2].CampID, DateTime.ParseExact("2018-06-24", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), DateTime.ParseExact("2018-06-26", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture));
+			Campsite_DAL site_DAL = new Campsite_DAL();
+
+			List<Campsite> campsites = site_DAL.GetCampsitesByCampground(selectedCampground.CampID, DateTime.ParseExact("2018-06-24", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), DateTime.ParseExact("2018-06-26", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture));
 
 			Console.WriteLine();
 			Console.WriteLine("Site No.".PadRight(15) + "Max Occup.".PadRight(15) + "Accessible?".PadRight(15) + "Max RV Length".PadRight(20) + "Utility".PadRight(15) + "Cost");
 
-			foreach (var site in yetAnotherList)
+			foreach (var site in campsites)
 			{
-				Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{boolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{boolChecker(site.UtilityAccess)}".PadRight(15) + $"{notherList[2].DailyFee:c}");
+				Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{boolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{boolChecker(site.UtilityAccess)}".PadRight(15) + $"{selectedCampground.DailyFee:c}");
 			}
 		}
 
