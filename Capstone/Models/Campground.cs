@@ -8,15 +8,15 @@ namespace Capstone.Models
 {
     public class Campground
     {
-        public int Campground_Id { get; set; }
+        public int CampgID { get; set; }
 
-        public int Park_Id { get; set; }
+        public int ParkID { get; set; }
 
         public string Name { get; set; }
 
-        public int OpenMonth { get; set; }
+        public int FirstMonthOpen { get; set; }
 
-        public int CloseMonth { get; set; }
+        public int LastMonthOpen { get; set; }
 
         public double DailyFee { get; set; }
     }

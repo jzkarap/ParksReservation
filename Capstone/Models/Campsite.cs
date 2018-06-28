@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Capstone.Models
 {
-    public class Site
+    public class Campsite
     {
-        public int SiteId { get; set; }
+        public int SiteID { get; set; }
 
-        public int CampgroundId { get; set; }
+        public int CampgroundID { get; set; }
 
         public int SiteNumber { get; set; }
 

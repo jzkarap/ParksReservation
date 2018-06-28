@@ -8,17 +8,17 @@ namespace Capstone.Models
 {
     public class Park
     {
-        public int Park_Id { get; set; }
+        public int ParkID { get; set; }
 
         public string Name { get; set; }
 
         public string Location { get; set; }
 
-        public DateTime EstablishDate { get; set; }
+        public DateTime DateEstablished { get; set; }
 
-        public int Area { get; set; }
+        public int AreaInKmSquared { get; set; }
 
-        public int Visitors { get; set; }
+        public int AnnualVisitorCount { get; set; }
 
         public string Description { get; set; }
     }

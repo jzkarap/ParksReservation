@@ -16,7 +16,7 @@ namespace Capstone.Tests
             ParkSqlDAL testDAL = new ParkSqlDAL(ConnectionString);
 
             // Act
-            IDictionary<int, Park> testResults = testDAL.GetParks();
+            IList<Park> testResults = testDAL.GetParks();
 
             int parksCount = testResults.Count;
 

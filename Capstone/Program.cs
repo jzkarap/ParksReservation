@@ -13,9 +13,8 @@ namespace Capstone
         static void Main(string[] args)
         {
             CampgroundCLI cli = new CampgroundCLI();
-            cli.PrintHeader();
-            Thread.Sleep(800);
-            cli.DisplayAvailableParks();
+
+            cli.RunCLI();
         }
     }
 }
