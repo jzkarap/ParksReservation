@@ -93,7 +93,7 @@ namespace Capstone
 
         private void PresentCampgroundInfo(IList<Campground> campgrounds)
         {
-            Console.WriteLine("Name".PadLeft(10).PadRight(40) + "Open".PadRight(10) + "Close".PadRight(10) + "Daily Fee");
+            Console.WriteLine("Name".PadLeft(10).PadRight(40) + "Open".PadRight(10) + "Close".PadRight(15) + "Daily Fee");
 
             for (int i = 0; i < campgrounds.Count; i++)
             {
@@ -106,7 +106,7 @@ namespace Capstone
                 double dailyFee = campgrounds[i].DailyFee;
 
                 // EXPAND INFO
-                Console.WriteLine($"#{campID}".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(10) + $"{dailyFee}");
+                Console.WriteLine($"#{campID}".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(15) + $"{dailyFee:C2}");
 
             }
         }
