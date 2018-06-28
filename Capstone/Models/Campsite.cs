@@ -20,6 +20,6 @@ namespace Capstone.Models
 
         public int MaxRVLength { get; set; }
 
-        public bool Utilities { get; set; }
+        public bool UtilityAccess { get; set; }
     }
 }
