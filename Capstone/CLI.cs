@@ -14,15 +14,18 @@ namespace Capstone
 		const string DatabaseConnection = @"Data Source=.\SQLExpress;Initial Catalog=Campground;Integrated Security=True";
 
 		/// <summary>
-		/// User selected park, available through class
+		/// User selection for park, will be available throughout class
 		/// </summary>
 		static int parkToDisplay;
+
+		/// <summary>
+		/// User selected park, which will be used to find campgrounds
+		/// </summary>
+		static Park selectedPark;
 
 		// Gets list parksAvailable from parkDAL
 		static Park_DAL parkDAL = new Park_DAL();
 		static IList<Park> parksAvailable = parkDAL.GetParks();
-
-		static Park selectedPark;
 
 		/// <summary>
 		/// Initiates CLI
@@ -264,7 +267,7 @@ namespace Capstone
 				switch (userInput)
 				{
 					case "1":
-						// SearchForReservations();
+						SearchForAvailableCampsites();
 						return;
 
 					case "2":
@@ -276,6 +279,19 @@ namespace Capstone
 				Thread.Sleep(1000);
 				ClearCurrentConsoleLine();
 				userInput = GetUserInputString();
+			}
+		}
+
+		private void SearchForAvailableCampsites()
+		{
+			List<Campsite> campsites = campgrounds.GetCampsitesByCampground(notherList[2].CampID, DateTime.ParseExact("2018-06-24", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), DateTime.ParseExact("2018-06-26", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture));
+
+			Console.WriteLine();
+			Console.WriteLine("Site No.".PadRight(15) + "Max Occup.".PadRight(15) + "Accessible?".PadRight(15) + "Max RV Length".PadRight(20) + "Utility".PadRight(15) + "Cost");
+
+			foreach (var site in yetAnotherList)
+			{
+				Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{boolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{boolChecker(site.UtilityAccess)}".PadRight(15) + $"{notherList[2].DailyFee:c}");
 			}
 		}
 
@@ -353,6 +369,49 @@ namespace Capstone
 			Console.SetCursorPosition(0, Console.CursorTop - 1);
 			Console.Write(new string(' ', Console.WindowWidth));
 			Console.SetCursorPosition(0, Console.CursorTop - 1);
+		}
+
+		/// <summary>
+		/// Converts boolean response to Yes/No
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		static string boolChecker(bool value)
+		{
+			string boolRepresentation = "";
+
+			if (value == true)
+			{
+				boolRepresentation = "Yes";
+			}
+			if (value == false)
+			{
+				boolRepresentation = "No";
+			}
+
+			return boolRepresentation;
+		}
+
+		/// <summary>
+		/// Checks if RVs are allowed,
+		/// Gives "N/A" if not
+		/// </summary>
+		/// <param name="maxLength"></param>
+		/// <returns></returns>
+		static string RVChecker(int maxLength)
+		{
+			string RVInfo = "";
+
+			if (maxLength == 0)
+			{
+				RVInfo = "N/A";
+			}
+			else
+			{
+				RVInfo = maxLength.ToString();
+			}
+
+			return RVInfo;
 		}
 	}
 }
