@@ -13,12 +13,97 @@ namespace Capstone
     {
         const string DatabaseConnection = @"Data Source=.\SQLExpress;Initial Catalog=Campground;Integrated Security=True";
 
+        int parkToDisplay = 0;
+
+        // Gets list parksAvailable from parkDAL
+        static Park_DAL parkDAL = new Park_DAL();
+        IList<Park> parksAvailable = parkDAL.GetParks();
+
         public void RunCLI()
         {
             PrintHeader();
             Thread.Sleep(800);
 
             DisplayAvailableParks();
+        }
+
+        private string GetMonthFromSQLInt(int month)
+        {
+            switch (month)
+            {
+                case 1:
+                    return "January";
+
+                case 2:
+                    return "February";
+
+                case 3:
+                    return "March";
+
+                case 4:
+                    return "April";
+
+                case 5:
+                    return "May";
+
+                case 6:
+                    return "June";
+
+                case 7:
+                    return "July";
+
+                case 8:
+                    return "August";
+
+                case 9:
+                    return "September";
+
+                case 10:
+                    return "October";
+
+                case 11:
+                    return "November";
+
+                case 12:
+                    return "December";
+
+                default:
+                    return "N/A";
+            }
+        }
+
+
+        public void PresentCampgroundsByPark()
+        {
+            int parkForCampgrounds = parksAvailable[parkToDisplay].ParkID;
+            string parkName = parksAvailable[parkToDisplay].Name;
+
+            Campground_DAL campDAL = new Campground_DAL();
+
+            IList<Campground> campgrounds = campDAL.GetCampgroundsByPark(parkForCampgrounds);
+
+            Console.Clear();
+            Console.WriteLine(parkName);
+            Console.WriteLine();
+
+            Console.WriteLine("Name".PadLeft(10).PadRight(40) + "Open".PadRight(10) + "Close".PadRight(10) + "Daily Fee");
+
+            for (int i = 0; i < campgrounds.Count; i++)
+            {
+                Campground c = campgrounds[i];
+
+                int campID = campgrounds[i].CampID;
+                string campground = campgrounds[i].Name;
+                string firstMonth = GetMonthFromSQLInt(c.FirstMonthOpen);
+                string lastMonth = GetMonthFromSQLInt(c.LastMonthOpen);
+                double dailyFee = campgrounds[i].DailyFee;
+
+                // EXPAND INFO
+                Console.WriteLine($"{campID}".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(10) + $"{dailyFee}");
+
+            }
+
+            Console.WriteLine();
         }
 
         public void PresentParkInfo(Park selectedPark)
@@ -38,13 +123,8 @@ namespace Capstone
         public void DisplayAvailableParks()
         {
             Console.WriteLine("View Parks Interface");
-            Park_DAL parkDAL = new Park_DAL();
-
-            // Gets list parksAvailable from parkDAL
-            IList<Park> parksAvailable = parkDAL.GetParks();
 
             string userChoice = "";
-            int parkToDisplay = 0;
 
             List<int> validOptions = new List<int>();
 
@@ -57,8 +137,12 @@ namespace Capstone
                     // Displays parks contained within parksAvailable
                     for (var i = 0; i < parksAvailable.Count; i++)
                     {
-                        Console.WriteLine($"{i + 1}) {parksAvailable[i].Name}");
-                        validOptions.Add(i + 1);
+                        int listEntryNumber = i + 1;
+                        string parkName = parksAvailable[i].Name;
+
+                        Console.WriteLine($"{listEntryNumber}) {parkName}");
+
+                        validOptions.Add(listEntryNumber);
                     }
 
                     Console.WriteLine("Q) Quit");
@@ -78,9 +162,13 @@ namespace Capstone
                     }
                     else
                     {
-                        parkToDisplay = (int.Parse(userChoice) + 1);
+                        // Gets index of park from parksAvailable by subtracting 1 from the user's choice
+                        // (to account for 0-based index)
+                        parkToDisplay = (int.Parse(userChoice) - 1);
 
-                        PresentParkInfo(parksAvailable[parkToDisplay]);
+                        Park selectedPark = parksAvailable[parkToDisplay];
+
+                        PresentParkInfo(selectedPark);
 
                         Console.WriteLine();
 
@@ -104,6 +192,8 @@ namespace Capstone
             const string searchForReservations = "2";
             const string returnToParks = "3";
 
+  
+
             bool getUsOutTheLoop = true;
 
             Console.WriteLine();
@@ -119,7 +209,7 @@ namespace Capstone
                 switch (command.ToLower())
                 {
                     case getCampgrounds:
-                        //campgroundDAL.GetCampgrounds();
+                        PresentCampgroundsByPark();
                         getUsOutTheLoop = false;
                         break;
 
