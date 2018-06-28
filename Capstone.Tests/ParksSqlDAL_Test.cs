@@ -7,13 +7,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Capstone.Tests
 {
     [TestClass]
-    public class ParksSqlDAL_Test : CapstoneDBTests
+    public class Park_DAL_Test : CapstoneDBTests
     {
         [TestMethod]
         public void GetParks_Test()
         {
             // Arrange
-            ParkSqlDAL testDAL = new ParkSqlDAL(ConnectionString);
+            Park_DAL testDAL = new Park_DAL();
 
             // Act
             IList<Park> testResults = testDAL.GetParks();

@@ -44,13 +44,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CampgroundCLI.cs" />
-    <Compile Include="DAL\CampgroundSqlDAL.cs" />
-    <Compile Include="DAL\ParkSqlDAL.cs" />
+    <Compile Include="CLI.cs" />
+    <Compile Include="DAL\Campground_DAL.cs" />
+    <Compile Include="DAL\Campsite_DAL.cs" />
+    <Compile Include="DAL\Master_DAL.cs" />
+    <Compile Include="DAL\Park_DAL.cs" />
     <Compile Include="Models\Campground.cs" />
     <Compile Include="Models\Park.cs" />
     <Compile Include="Models\Reservation.cs" />
-    <Compile Include="Models\Site.cs" />
+    <Compile Include="Models\Campsite.cs" />
+    <Compile Include="Models\Reservation_DAL.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

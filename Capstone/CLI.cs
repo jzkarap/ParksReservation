@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Capstone
 {
-    public class CampgroundCLI
+    public class CLI
     {
         const string DatabaseConnection = @"Data Source=.\SQLExpress;Initial Catalog=Campground;Integrated Security=True";
 
@@ -21,18 +21,29 @@ namespace Capstone
             DisplayAvailableParks();
         }
 
+        public void PresentParkInfo(Park selectedPark)
+        {
+            Console.WriteLine($"{selectedPark.Name}");
+            Console.WriteLine("Location".PadRight(20) + $"{selectedPark.Location}");
+            Console.WriteLine("Established".PadRight(20) + $"{selectedPark.DateEstablished.ToString("dd/MM/yyyy")}");
+            Console.WriteLine("Area".PadRight(20) + $"{selectedPark.AreaInKmSquared} sq km");
+            Console.WriteLine("Annual Visitors".PadRight(20) + $"{selectedPark.AnnualVisitorCount}");
+            Console.WriteLine();
+            Console.WriteLine($"{selectedPark.Description}");
+        }
+
         /// <summary>
         /// Displays a list of parks available for selection
         /// </summary>
         public void DisplayAvailableParks()
         {
             Console.WriteLine("View Parks Interface");
-            ParkSqlDAL parkDAL = new ParkSqlDAL(DatabaseConnection);
+            Park_DAL parkDAL = new Park_DAL();
 
-            // Gets dictionary parksAvailable from parkDAL
-            IDictionary<int, Park> parksAvailable = parkDAL.GetParks();
+            // Gets list parksAvailable from parkDAL
+            IList<Park> parksAvailable = parkDAL.GetParks();
 
-            string userChoice;
+            string userChoice = "";
             int parkToDisplay = 0;
 
             List<int> validOptions = new List<int>();
@@ -44,14 +55,10 @@ namespace Capstone
                     Console.WriteLine("Select a Park for Further Details:");
 
                     // Displays parks contained within parksAvailable
-                    foreach (var kvp in parksAvailable)
+                    for (var i = 0; i < parksAvailable.Count; i++)
                     {
-                        validOptions.Add(kvp.Key);
-
-                        int selection = kvp.Key;
-                        Park park = kvp.Value;
-
-                        Console.WriteLine($"{selection}) {park.Name}");
+                        Console.WriteLine($"{i + 1}) {parksAvailable[i].Name}");
+                        validOptions.Add(i + 1);
                     }
 
                     Console.WriteLine("Q) Quit");
@@ -66,13 +73,16 @@ namespace Capstone
                         Console.Clear();
                         Console.WriteLine("Goodbye!");
                         Console.WriteLine();
-                        break;
+
+                        return;
                     }
                     else
                     {
-                        parkToDisplay = int.Parse(userChoice);
+                        parkToDisplay = (int.Parse(userChoice) + 1);
 
-                        parkDAL.GetParkToDisplay(parkToDisplay);
+                        PresentParkInfo(parksAvailable[parkToDisplay]);
+
+                        Console.WriteLine();
 
                         DisplayCampgrounds();
 
