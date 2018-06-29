@@ -27,6 +27,10 @@ namespace Capstone
         static Park_DAL parkDAL = new Park_DAL();
         static IList<Park> parksAvailable = parkDAL.GetParks();
 
+        Campground_DAL campDAL = new Campground_DAL();
+
+        static IList<Campground> campgrounds;
+
         /// <summary>
         /// Initiates CLI
         /// </summary>
@@ -190,9 +194,7 @@ namespace Capstone
             int parkForCampgrounds = parksAvailable[parkToDisplay].ParkID;
             string parkName = parksAvailable[parkToDisplay].Name;
 
-            Campground_DAL campDAL = new Campground_DAL();
-
-            IList<Campground> campgrounds = campDAL.GetCampgroundsByPark(parkForCampgrounds);
+            campgrounds = campDAL.GetCampgroundsByPark(parkForCampgrounds);
 
             Console.Clear();
             Console.WriteLine("Park Campgrounds");
@@ -261,20 +263,23 @@ namespace Capstone
         {
             Console.WriteLine();
 
-            while (userInput != "1" ||
-                    userInput != "2")
+            try
             {
                 switch (userInput)
                 {
                     case "1":
                         GetReservationInfo();
-                        return;
+                        break;
 
                     case "2":
                         PresentParkInfo(selectedPark);
                         return;
                 }
 
+
+            }
+            catch (Exception)
+            {
                 Console.WriteLine("Please select a valid option!");
                 Thread.Sleep(1000);
                 ClearCurrentConsoleLine();
@@ -292,12 +297,25 @@ namespace Capstone
             {
                 try
                 {
+
                     Console.Write("Which campground (enter 0 to cancel)? ");
                     userSelection = Convert.ToInt32(Console.ReadLine());
+
+                    if (userSelection == 0)
+                    {
+                        // Keep the cursor at a consistent height
+                        ClearCurrentConsoleLine();
+                        ClearCurrentConsoleLine();
+                        CampsiteCommands(GetUserInputString());
+                        break;
+                    }
+
                     Console.Write("What is the arrival date? (mm/dd/yyyy) ");
                     arrivalDate = DateTimeTranslation();
                     Console.Write("What is the departure date? (mm/dd/yyyy) ");
                     departureDate = DateTimeTranslation();
+
+                    SearchForAvailableCampsites(campgrounds[userSelection], arrivalDate, departureDate);
 
                 }
                 catch (Exception)
@@ -311,11 +329,11 @@ namespace Capstone
 
         }
 
-        private void SearchForAvailableCampsites(Campground selectedCampground)
+        private void SearchForAvailableCampsites(Campground selectedCampground, DateTime startDate, DateTime endDate)
         {
             Campsite_DAL site_DAL = new Campsite_DAL();
 
-            List<Campsite> campsites = site_DAL.GetCampsitesByCampground(selectedCampground.CampID, DateTime.ParseExact("2018-06-24", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), DateTime.ParseExact("2018-06-26", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture));
+            List<Campsite> campsites = site_DAL.GetCampsitesByCampground(selectedCampground.CampID, startDate, endDate);
 
             Console.WriteLine();
             Console.WriteLine("Site No.".PadRight(15) + "Max Occup.".PadRight(15) + "Accessible?".PadRight(15) + "Max RV Length".PadRight(20) + "Utility".PadRight(15) + "Cost");
