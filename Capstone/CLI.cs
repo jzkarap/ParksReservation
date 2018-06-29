@@ -307,15 +307,10 @@ namespace Capstone
         private void GetSitesAvailableForReservation()
         {
             int userSelection = 1;
-            string arrivalDateTemp;
-            string departureDateTemp;
+            string temporaryArrivalDateString;
+            string temporaryDepartureDateString;
             DateTime? arrivalDate = null;
             DateTime? departureDate = null;
-
-            //  TODO:
-            //  Check for correct campground at selection (not at the end)
-            //  Ensure the program does not move on if an invalid input is entered
-            //  Stop menu from appearing after the site selection appears
 
             while (departureDate == null)
             {
@@ -335,24 +330,24 @@ namespace Capstone
                     while (arrivalDate == null)
                     {
                         Console.Write("What is the arrival date? (mm/dd/yyyy) ");
-                        arrivalDateTemp = Console.ReadLine();
+                        temporaryArrivalDateString = Console.ReadLine();
 
-                        if (arrivalDateTemp == "0")
+                        if (temporaryArrivalDateString == "0")
                         {
                             ClearCurrentConsoleLine();
                             Cancel();
                             break;
                         }
 
-                        arrivalDate = DateTimeTranslation(arrivalDateTemp);
+                        arrivalDate = DateTimeTranslation(temporaryArrivalDateString);
                     }
 
                     while (departureDate == null)
                     {
                         Console.Write("What is the departure date? (mm/dd/yyyy) ");
-                        departureDateTemp = Console.ReadLine();
+                        temporaryDepartureDateString = Console.ReadLine();
 
-                        if (departureDateTemp == "0")
+                        if (temporaryDepartureDateString == "0")
                         {
                             ClearCurrentConsoleLine();
                             ClearCurrentConsoleLine();
@@ -360,10 +355,11 @@ namespace Capstone
                             break;
                         }
 
-                        departureDate = DateTimeTranslation(departureDateTemp);
-                    }
+                        departureDate = DateTimeTranslation(temporaryDepartureDateString);
 
-                    SearchForAvailableCampsites(campgrounds[userSelection - 1], arrivalDate, departureDate);
+                        SearchForAvailableCampsites(campgrounds[userSelection - 1], arrivalDate, departureDate);
+
+                    }
                 }
                 catch (Exception)
                 {
@@ -372,6 +368,7 @@ namespace Capstone
                     ClearCurrentConsoleLine();
                     ClearCurrentConsoleLine();
                 }
+
             }
 
         }
@@ -392,35 +389,52 @@ namespace Capstone
         /// <summary>
         /// Collects the site to reserve
         /// </summary>
-        private Campsite GetCampsiteToReserve()
+        private int GetCampsiteToReserve()
         {
             int? desiredCampsite = null;
-            string familyName = String.Empty;
+            string temporaryDesiredCampsite = "";
             Campsite chosenSite = null;
+
+            //  custom exception to maintain loop and inform user
+            Exception invalidInput = new Exception();
 
             while (desiredCampsite == null)
             {
-                desiredCampsite = Convert.ToInt32(Console.ReadLine());
-
                 for (int i = 0; i < campsites.Count; i++)
                 {
+                    try
+                    {
+                        temporaryDesiredCampsite = Console.ReadLine();
+
+                        //  if we don't have a match,
+                        if (!Regex.IsMatch(temporaryDesiredCampsite, @"^[0-9]+$"))
+                        {
+                            // throw and catch
+                            throw invalidInput;
+                        }
+
+                        desiredCampsite = int.Parse(temporaryDesiredCampsite);
+
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Invalid site selected. Please select a valid site.");
+                        Thread.Sleep(1000);
+                        ClearCurrentConsoleLine();
+                        ClearCurrentConsoleLine();
+                        Console.Write("Which site should be reserved (enter 0 to cancel)? ");
+                    }
+
+                    //  when the desiredCampsite matches an ID on the list
                     if (desiredCampsite == campsites[i].SiteID)
                     {
                         chosenSite = campsites[i];
                         break;
                     }
-                    else
-                    {
-                        Console.WriteLine("Invalid site selected. Please select a valid site.");
-                        Thread.Sleep(1000);
-                        ClearCurrentConsoleLine();
-                        desiredCampsite = Convert.ToInt32(Console.ReadLine());
-                    }
-
                 }
             }
-
-            return chosenSite;
+            //  we need this campsite's ID to make a reservation
+            return chosenSite.SiteID;
         }
 
         private string GetNameForReservation()
@@ -431,6 +445,8 @@ namespace Capstone
             while (!regex)
             {
                 Console.WriteLine("Invalid input.  Please enter a valid name.");
+                Thread.Sleep(1000);
+                ClearCurrentConsoleLine();
                 name = Console.ReadLine();
             }
 
@@ -523,9 +539,6 @@ namespace Capstone
             }
 
         }
-
-
-
 
         /// <summary>
         /// Translates SQL data to month as string
