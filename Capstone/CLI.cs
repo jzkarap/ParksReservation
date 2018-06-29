@@ -210,7 +210,7 @@ namespace Capstone
         }
 
         /// <summary>
-        /// Goes through list of camgpgrounds, printing relevant info to console
+        /// Goes through list of campgrounds, printing relevant info to console
         /// </summary>
         /// <param name="campgrounds"></param>
         private void PresentCampgroundInfo(IList<Campground> campgrounds)
@@ -290,33 +290,58 @@ namespace Capstone
         private void GetReservationInfo()
         {
             int userSelection = 1;
-            DateTime arrivalDate;
-            DateTime departureDate;
+            string arrivalDateTemp;
+            string departureDateTemp;
+            DateTime? arrivalDate = null;
+            DateTime? departureDate = null;
+
+            //  TODO:
+            //  Check for correct campground at selection (not at the end)
+            //  Ensure the program does not move on if an invalid input is entered
+            //  Stop menu from appearing after the site selection appears
 
             while (userSelection != 0)
             {
                 try
                 {
-
-                    Console.Write("Which campground (enter 0 to cancel)? ");
-                    userSelection = Convert.ToInt32(Console.ReadLine());
+                    userSelection = GetCampgroundSelection();
 
                     if (userSelection == 0)
                     {
-                        // Keep the cursor at a consistent height
-                        ClearCurrentConsoleLine();
-                        ClearCurrentConsoleLine();
-                        CampsiteCommands(GetUserInputString());
+                        Cancel();
                         break;
                     }
 
-                    Console.Write("What is the arrival date? (mm/dd/yyyy) ");
-                    arrivalDate = DateTimeTranslation();
+                    while (arrivalDate == null)
+                    {
+                        Console.Write("What is the arrival date? (mm/dd/yyyy) ");
+                        arrivalDateTemp = Console.ReadLine();
+
+                        if (arrivalDateTemp == "0")
+                        {
+                            ClearCurrentConsoleLine();
+                            Cancel();
+                            break;
+                        }
+
+                        arrivalDate = DateTimeTranslation(arrivalDateTemp);
+                    }
+
+
                     Console.Write("What is the departure date? (mm/dd/yyyy) ");
-                    departureDate = DateTimeTranslation();
+                    departureDateTemp = Console.ReadLine();
 
-                    SearchForAvailableCampsites(campgrounds[userSelection], arrivalDate, departureDate);
+                    if (departureDateTemp == "0")
+                    {
+                        ClearCurrentConsoleLine();
+                        ClearCurrentConsoleLine();
+                        Cancel();
+                        break;
+                    }
 
+                    departureDate = DateTimeTranslation(departureDateTemp);
+
+                    SearchForAvailableCampsites(campgrounds[userSelection - 1], arrivalDate, departureDate);
                 }
                 catch (Exception)
                 {
@@ -329,7 +354,17 @@ namespace Capstone
 
         }
 
-        private void SearchForAvailableCampsites(Campground selectedCampground, DateTime startDate, DateTime endDate)
+        private int GetCampgroundSelection()
+        {
+            int userSelection = 1;
+
+            Console.Write("Which campground (enter 0 to cancel)? ");
+            userSelection = Convert.ToInt32(Console.ReadLine());
+
+            return userSelection;
+        }
+
+        private void SearchForAvailableCampsites(Campground selectedCampground, DateTime? startDate, DateTime? endDate)
         {
             Campsite_DAL site_DAL = new Campsite_DAL();
 
@@ -340,35 +375,39 @@ namespace Capstone
 
             foreach (var site in campsites)
             {
-                Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{boolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{boolChecker(site.UtilityAccess)}".PadRight(15) + $"{selectedCampground.DailyFee:c}");
+                Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{BoolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{BoolChecker(site.UtilityAccess)}".PadRight(15) + $"{selectedCampground.DailyFee:c}");
             }
         }
 
-        private DateTime DateTimeTranslation()
+        private void Cancel()
+        {
+            // Keep the cursor at a consistent height
+            ClearCurrentConsoleLine();
+            ClearCurrentConsoleLine();
+            CampsiteCommands(GetUserInputString());
+        }
+
+        private DateTime? DateTimeTranslation(string dateToTranslate)
         {
             DateTime date = new DateTime();
-            bool correctFormat = false;
 
-            while (correctFormat == false)
+            if (DateTime.TryParse(dateToTranslate, out date))
             {
-                if (DateTime.TryParse(Console.ReadLine(), out date))
-                {
-                    correctFormat = true;
-                }
-                else
-                {
-                    // FIX TEXT CHUNK THAT IS NOT DELETED
-                    Console.WriteLine("This date is in an incorrect format. Please try again.");
-                    Console.WriteLine();
-                    Thread.Sleep(1000);
-                    ClearCurrentConsoleLine();
-                    Console.SetCursorPosition(0, Console.CursorTop);
-                    ClearCurrentConsoleLine();
-
-                }
+                return date;
+            }
+            else
+            {
+                // FIX TEXT CHUNK THAT IS NOT DELETED
+                Console.WriteLine("This date is in an incorrect format. Please try again.");
+                Console.WriteLine();
+                Thread.Sleep(1000);
+                ClearCurrentConsoleLine();
+                Console.SetCursorPosition(0, Console.CursorTop);
+                ClearCurrentConsoleLine();
+                ClearCurrentConsoleLine();
+                return null;
             }
 
-            return date;
         }
 
 
@@ -450,7 +489,7 @@ namespace Capstone
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        static string boolChecker(bool value)
+        static string BoolChecker(bool value)
         {
             string boolRepresentation = "";
 
