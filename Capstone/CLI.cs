@@ -312,7 +312,10 @@ namespace Capstone
             DateTime? arrivalDate = null;
             DateTime? departureDate = null;
 
-            while (departureDate == null)
+            Exception BrokenDateRange = new Exception();
+
+            while (arrivalDate == null ||
+                   departureDate == null)
             {
                 try
                 {
@@ -344,23 +347,39 @@ namespace Capstone
 
                     while (departureDate == null)
                     {
-
-                        Console.Write("What is the departure date? (mm/dd/yyyy) ");
-                        temporaryDepartureDateString = Console.ReadLine();
-
-                        if (temporaryDepartureDateString == "0")
+                        try
                         {
+                            Console.Write("What is the departure date? (mm/dd/yyyy) ");
+                            temporaryDepartureDateString = Console.ReadLine();
+
+                            if (temporaryDepartureDateString == "0")
+                            {
+                                ClearCurrentConsoleLine();
+                                ClearCurrentConsoleLine();
+                                Cancel();
+                                break;
+                            }
+
+                            departureDate = DateTimeTranslation(temporaryDepartureDateString);
+
+
+                            if (departureDate < arrivalDate)
+                            {
+                                departureDate = null;
+                                throw BrokenDateRange;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Please enter a valid date range.");
+                            Thread.Sleep(1000);
                             ClearCurrentConsoleLine();
                             ClearCurrentConsoleLine();
-                            Cancel();
-                            break;
                         }
 
-                        departureDate = DateTimeTranslation(temporaryDepartureDateString);
-
-                        SearchForAvailableCampsites(campgrounds[userSelection - 1], arrivalDate, departureDate);
-
                     }
+
+                    SearchForAvailableCampsites(campgrounds[userSelection - 1], arrivalDate, departureDate);
                 }
                 catch (Exception)
                 {
