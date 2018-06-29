@@ -42,23 +42,6 @@ namespace Capstone.Models
             }
         }
 
-        public void ReadReservation(int siteID, string name, DateTime arrivalDate, DateTime departureDate)
-        {
-            try
-            {
-                using (var conn = new SqlConnection(dbConnectionString))
-                {
-                    conn.Open();
-
-                }
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("Sorry, an error occurred: " + ex.Message);
-                throw;
-            }
-        }
-
         //  Get the most recent reservation by ID
         public int RetrieveMostRecentReservation()
         {

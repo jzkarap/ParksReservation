@@ -31,6 +31,8 @@ namespace Capstone
 
         static IList<Campground> campgrounds;
 
+        static List<Campsite> campsites;
+
         /// <summary>
         /// Initiates CLI
         /// </summary>
@@ -265,15 +267,29 @@ namespace Capstone
 
             try
             {
-                switch (userInput)
+                while (userInput != "1" ||
+                    userInput != "2")
                 {
-                    case "1":
-                        GetReservationInfo();
-                        break;
+                    switch (userInput)
+                    {
+                        case "1":
+                            GetSitesAvailableForReservation();
+                            return;
 
-                    case "2":
-                        PresentParkInfo(selectedPark);
-                        return;
+                        case "2":
+                            PresentParkInfo(selectedPark);
+                            return;
+                    }
+
+                    Console.WriteLine("Please select a valid option!");
+                    Thread.Sleep(1000);
+
+                    // these two methods clean up the space
+                    ClearCurrentConsoleLine();
+                    ClearCurrentConsoleLine();
+
+                    // re-assign the user input to correctly break out
+                    userInput = Console.ReadLine();
                 }
 
 
@@ -287,7 +303,7 @@ namespace Capstone
             }
         }
 
-        private void GetReservationInfo()
+        private void GetSitesAvailableForReservation()
         {
             int userSelection = 1;
             string arrivalDateTemp;
@@ -300,11 +316,10 @@ namespace Capstone
             //  Ensure the program does not move on if an invalid input is entered
             //  Stop menu from appearing after the site selection appears
 
-            while (userSelection != 0)
+            while (departureDate == null)
             {
                 try
                 {
-                    Console.Write("Which campground (enter 0 to cancel)? ");
                     userSelection = GetCampgroundSelection();
 
                     {
@@ -360,6 +375,44 @@ namespace Capstone
 
         }
 
+        private void PromptForReservationSite()
+        {
+            Console.Write("Which site should be reserved (enter 0 to cancel)? ");
+            Campsite chosenSite = GetCampsiteToReserve();
+
+        }
+
+        /// <summary>
+        /// Collects the site to reserve
+        /// </summary>
+        private Campsite GetCampsiteToReserve()
+        {
+            int? desiredCampsite = null;
+            string familyName = String.Empty;
+            Campsite chosenSite = null;
+
+            while (desiredCampsite == null)
+            {
+                desiredCampsite = Convert.ToInt32(Console.ReadLine());
+
+                for (int i = 0; i < campsites.Count; i++)
+                {
+                    if (desiredCampsite == campsites[i].SiteID)
+                    {
+                        chosenSite = campsites[i];
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid site selected. Please select a valid site.");
+                        desiredCampsite = Convert.ToInt32(Console.ReadLine());
+                    }
+
+                }
+            }
+
+            return chosenSite;
+        }
+
         private int GetCampgroundSelection()
         {
             List<int> validOptions = new List<int>();
@@ -370,6 +423,8 @@ namespace Capstone
             }
 
             int userSelection = 0;
+
+            Console.Write("Which campground (enter 0 to cancel)? ");
             userSelection = Convert.ToInt32(Console.ReadLine());
 
             if (userSelection == 0)
@@ -386,6 +441,8 @@ namespace Capstone
                     Console.SetCursorPosition(0, Console.CursorTop);
                     ClearCurrentConsoleLine();
                     ClearCurrentConsoleLine();
+                    ClearCurrentConsoleLine();
+                    Console.Write("Which campground (enter 0 to cancel)? ");
 
                     userSelection = Convert.ToInt32(Console.ReadLine());
                 }
@@ -398,7 +455,7 @@ namespace Capstone
         {
             Campsite_DAL site_DAL = new Campsite_DAL();
 
-            List<Campsite> campsites = site_DAL.GetCampsitesByCampground(selectedCampground.CampID, startDate, endDate);
+            campsites = site_DAL.GetCampsitesByCampground(selectedCampground.CampID, startDate, endDate);
 
             Console.WriteLine();
             Console.WriteLine("Site No.".PadRight(15) + "Max Occup.".PadRight(15) + "Accessible?".PadRight(15) + "Max RV Length".PadRight(20) + "Utility".PadRight(15) + "Cost");

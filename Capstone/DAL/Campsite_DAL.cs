@@ -12,8 +12,8 @@ namespace Capstone.DAL
     {
         private const string SQL_GetUnbookedCampsites = "SELECT TOP 5 site.site_id, site_number, max_occupancy, max_rv_length, utilities, campground_id, accessible " +
             "FROM site INNER JOIN reservation ON reservation.site_id = site.site_id " +
-            "WHERE site.campground_id = @campground_id AND reservation.from_date > @from_date " +
-            "AND reservation.from_date > @to_date " +
+            "WHERE site.campground_id = @campground_id AND reservation.from_date NOT BETWEEN @from_date AND @to_date " +
+            "AND reservation.from_date NOT BETWEEN @from_date AND @to_date " +
             "GROUP BY site.site_id, site.site_number, site.campground_id, site.max_occupancy, site.accessible, site.max_rv_length, site.utilities;";
 
         // GetCampsitesByPark
