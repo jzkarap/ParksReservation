@@ -221,13 +221,13 @@ namespace Capstone
             {
                 Campground c = campgrounds[i];
 
-                int campID = campgrounds[i].CampID;
+                int listNumber = i + 1;
                 string campground = campgrounds[i].Name;
                 string firstMonth = GetMonthFromSQLInt(c.FirstMonthOpen);
                 string lastMonth = GetMonthFromSQLInt(c.LastMonthOpen);
                 double dailyFee = campgrounds[i].DailyFee;
 
-                Console.WriteLine($"#{campID}".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(15) + $"{dailyFee:C2}");
+                Console.WriteLine($"#{listNumber})".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(15) + $"{dailyFee:C2}");
 
             }
         }
@@ -304,8 +304,16 @@ namespace Capstone
             {
                 try
                 {
-                    
+                    Console.Write("Which campground (enter 0 to cancel)? ");
                     userSelection = GetCampgroundSelection();
+
+                    {
+                        if (userSelection == 0)
+                        {
+                            Cancel();
+                            break;
+                        }
+                    }
 
                     // both while loops validate the user's input
                     while (arrivalDate == null)
@@ -354,37 +362,32 @@ namespace Capstone
 
         private int GetCampgroundSelection()
         {
-            int userSelection = 0;
-            bool flag = false;
+            List<int> validOptions = new List<int>();
 
-            Console.Write("Which campground (enter 0 to cancel)? ");
+            for (int i = 0; i < campgrounds.Count; i++)
+            {
+                validOptions.Add(i + 1);
+            }
+
+            int userSelection = 0;
             userSelection = Convert.ToInt32(Console.ReadLine());
 
-            while (flag == false)
+            if (userSelection == 0)
             {
-                for (int i = 0; i < campgrounds.Count; i++)
+                return userSelection;
+            }
+            else
+            {
+                while (!validOptions.Contains(userSelection))
                 {
-                    if (userSelection == 0)
-                    {
-                        Cancel();
-                        break;
-                    }
+                    Console.WriteLine("Please select a valid campground.");
+                    Console.WriteLine();
+                    Thread.Sleep(1000);
+                    Console.SetCursorPosition(0, Console.CursorTop);
+                    ClearCurrentConsoleLine();
+                    ClearCurrentConsoleLine();
 
-                    if (campgrounds[i].CampID == userSelection)
-                    {
-                        userSelection = i + 1;
-                        flag = true;
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Not a valid choice! Please select a campground.");
-                        Thread.Sleep(1000);
-                        ClearCurrentConsoleLine();
-                        ClearCurrentConsoleLine();
-                        userSelection = Convert.ToInt32(Console.ReadLine());
-                        break;
-                    }
+                    userSelection = Convert.ToInt32(Console.ReadLine());
                 }
             }
 
@@ -424,7 +427,6 @@ namespace Capstone
             }
             else
             {
-                // FIX TEXT CHUNK THAT IS NOT DELETED
                 Console.WriteLine("This date is in an incorrect format. Please try again.");
                 Console.WriteLine();
                 Thread.Sleep(1000);
