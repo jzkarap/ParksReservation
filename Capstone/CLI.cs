@@ -530,6 +530,10 @@ namespace Capstone
             Reservation_DAL reservationDAL = new Reservation_DAL();
 
             reservationDAL.CreateReservation(campSite, name, arrivalDate, departureDate);
+
+            int reservationID = reservationDAL.RetrieveMostRecentReservation();
+
+            Console.WriteLine($"The reservation has been made and the confirmation id is {reservationID}");
         }
 
 
