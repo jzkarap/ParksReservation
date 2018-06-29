@@ -344,6 +344,7 @@ namespace Capstone
 
                     while (departureDate == null)
                     {
+
                         Console.Write("What is the departure date? (mm/dd/yyyy) ");
                         temporaryDepartureDateString = Console.ReadLine();
 
@@ -373,24 +374,14 @@ namespace Capstone
 
         }
 
-        private void PromptSiteForReservation()
-        {
-            Console.WriteLine();
-            Console.Write("Which site should be reserved (enter 0 to cancel)? ");
-            Campsite chosenSite = GetCampsiteToReserve();
-        }
-
-        private void PromptNameForReservation()
-        {
-            Console.Write("What name should the reservation be made under? ");
-            string nameForReservation = GetNameForReservation();
-        }
-
         /// <summary>
         /// Collects the site to reserve
         /// </summary>
         private int GetCampsiteToReserve()
         {
+            Console.WriteLine();
+            Console.Write("Which site should be reserved (enter 0 to cancel)? ");
+
             int? desiredCampsite = null;
             string temporaryDesiredCampsite = "";
             Campsite chosenSite = null;
@@ -439,6 +430,8 @@ namespace Capstone
 
         private string GetNameForReservation()
         {
+            Console.Write("What name should the reservation be made under? ");
+
             string name = Console.ReadLine();
             var regex = Regex.IsMatch(name, @"^[a-zA-Z]+$");
 
@@ -506,9 +499,21 @@ namespace Capstone
                 Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{BoolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{BoolChecker(site.UtilityAccess)}".PadRight(15) + $"{selectedCampground.DailyFee:c}");
             }
 
-            PromptSiteForReservation();
-            PromptNameForReservation();
+            BookReservation(startDate, endDate);
         }
+
+
+        private void BookReservation(DateTime? arrivalDate, DateTime? departureDate)
+        {
+            int campSite = GetCampsiteToReserve();
+            string name = GetNameForReservation();
+
+            Reservation_DAL reservationDAL = new Reservation_DAL();
+
+            reservationDAL.CreateReservation(campSite, name, arrivalDate, departureDate);
+        }
+
+
 
         private void Cancel()
         {

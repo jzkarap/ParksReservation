@@ -17,7 +17,7 @@ namespace Capstone.Models
         private const string SQL_RetrieveMostRecentReservation = "SELECT MAX(reservation_id) FROM reservation;";
 
         // Create reservation
-        public void CreateReservation(int siteID, string name, DateTime arrivalDate, DateTime departureDate)
+        public void CreateReservation(int siteID, string name, DateTime? arrivalDate, DateTime? departureDate)
         {
             try
             {
