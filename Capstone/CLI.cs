@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -375,11 +376,17 @@ namespace Capstone
 
         }
 
-        private void PromptForReservationSite()
+        private void PromptSiteForReservation()
         {
+            Console.WriteLine();
             Console.Write("Which site should be reserved (enter 0 to cancel)? ");
             Campsite chosenSite = GetCampsiteToReserve();
+        }
 
+        private void PromptNameForReservation()
+        {
+            Console.Write("What name should the reservation be made under? ");
+            string nameForReservation = GetNameForReservation();
         }
 
         /// <summary>
@@ -400,10 +407,13 @@ namespace Capstone
                     if (desiredCampsite == campsites[i].SiteID)
                     {
                         chosenSite = campsites[i];
+                        break;
                     }
                     else
                     {
                         Console.WriteLine("Invalid site selected. Please select a valid site.");
+                        Thread.Sleep(1000);
+                        ClearCurrentConsoleLine();
                         desiredCampsite = Convert.ToInt32(Console.ReadLine());
                     }
 
@@ -411,6 +421,20 @@ namespace Capstone
             }
 
             return chosenSite;
+        }
+
+        private string GetNameForReservation()
+        {
+            string name = Console.ReadLine();
+            var regex = Regex.IsMatch(name, @"^[a-zA-Z]+$");
+
+            while (!regex)
+            {
+                Console.WriteLine("Invalid input.  Please enter a valid name.");
+                name = Console.ReadLine();
+            }
+
+            return name;
         }
 
         private int GetCampgroundSelection()
@@ -458,12 +482,16 @@ namespace Capstone
             campsites = site_DAL.GetCampsitesByCampground(selectedCampground.CampID, startDate, endDate);
 
             Console.WriteLine();
+            Console.WriteLine("Results Matching Your Search Criteria");
             Console.WriteLine("Site No.".PadRight(15) + "Max Occup.".PadRight(15) + "Accessible?".PadRight(15) + "Max RV Length".PadRight(20) + "Utility".PadRight(15) + "Cost");
 
             foreach (var site in campsites)
             {
                 Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{BoolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{BoolChecker(site.UtilityAccess)}".PadRight(15) + $"{selectedCampground.DailyFee:c}");
             }
+
+            PromptSiteForReservation();
+            PromptNameForReservation();
         }
 
         private void Cancel()
