@@ -304,14 +304,10 @@ namespace Capstone
             {
                 try
                 {
+                    
                     userSelection = GetCampgroundSelection();
 
-                    if (userSelection == 0)
-                    {
-                        Cancel();
-                        break;
-                    }
-
+                    // both while loops validate the user's input
                     while (arrivalDate == null)
                     {
                         Console.Write("What is the arrival date? (mm/dd/yyyy) ");
@@ -327,19 +323,21 @@ namespace Capstone
                         arrivalDate = DateTimeTranslation(arrivalDateTemp);
                     }
 
-
-                    Console.Write("What is the departure date? (mm/dd/yyyy) ");
-                    departureDateTemp = Console.ReadLine();
-
-                    if (departureDateTemp == "0")
+                    while (departureDate == null)
                     {
-                        ClearCurrentConsoleLine();
-                        ClearCurrentConsoleLine();
-                        Cancel();
-                        break;
-                    }
+                        Console.Write("What is the departure date? (mm/dd/yyyy) ");
+                        departureDateTemp = Console.ReadLine();
 
-                    departureDate = DateTimeTranslation(departureDateTemp);
+                        if (departureDateTemp == "0")
+                        {
+                            ClearCurrentConsoleLine();
+                            ClearCurrentConsoleLine();
+                            Cancel();
+                            break;
+                        }
+
+                        departureDate = DateTimeTranslation(departureDateTemp);
+                    }
 
                     SearchForAvailableCampsites(campgrounds[userSelection - 1], arrivalDate, departureDate);
                 }
@@ -356,10 +354,39 @@ namespace Capstone
 
         private int GetCampgroundSelection()
         {
-            int userSelection = 1;
+            int userSelection = 0;
+            bool flag = false;
 
             Console.Write("Which campground (enter 0 to cancel)? ");
             userSelection = Convert.ToInt32(Console.ReadLine());
+
+            while (flag == false)
+            {
+                for (int i = 0; i < campgrounds.Count; i++)
+                {
+                    if (userSelection == 0)
+                    {
+                        Cancel();
+                        break;
+                    }
+
+                    if (campgrounds[i].CampID == userSelection)
+                    {
+                        userSelection = i + 1;
+                        flag = true;
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Not a valid choice! Please select a campground.");
+                        Thread.Sleep(1000);
+                        ClearCurrentConsoleLine();
+                        ClearCurrentConsoleLine();
+                        userSelection = Convert.ToInt32(Console.ReadLine());
+                        break;
+                    }
+                }
+            }
 
             return userSelection;
         }
