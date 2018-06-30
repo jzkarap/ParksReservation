@@ -20,11 +20,11 @@ namespace Capstone.Models
 		// Create reservation
 		public void CreateReservation(int siteID, string name, DateTime? arrivalDate, DateTime? departureDate)
 		{
-			// Converts DateTime object arrival to string
+			// Converts DateTime object arrivalDate to string
 			string arrivalConversion1 = arrivalDate.ToString();
 			// Splits DateTime object to isolate date
 			string[] arrivalConversion2 = arrivalConversion1.Split(' ');
-			// Stores ONLY date inside a variable
+			// Stores ONLY date, as string, inside a variable
 			string arrivalConversion3 = arrivalConversion2[0];
 
 			// ... Ditto
@@ -66,10 +66,9 @@ namespace Capstone.Models
 			{
 				using (var conn = new SqlConnection(dbConnectionString))
 				{
-
 					SqlCommand cmd = new SqlCommand(SQL_RetrieveMostRecentReservation, conn);
 
-					newestReservation = Convert.ToInt32(cmd.ExecuteScalar());
+					newestReservation = (int)cmd.ExecuteScalar();
 				}
 			}
 			catch (Exception)
@@ -80,6 +79,11 @@ namespace Capstone.Models
 			return newestReservation;
 		}
 
+		// THE ABOVE METHOD DOES NOT WORK--
+		// WHY?
+
+		// ALSO: 
+		// RESERVATIONS CAN BE PLACED FOR DATES THAT OVERLAP EXISTING RESERVATIONS -- FIX
 
 		// BONUS:  Get reservations within next 30 days
 		// Returns a list of Reservations
