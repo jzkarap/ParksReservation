@@ -51,7 +51,7 @@ namespace Capstone
 		/// </summary>
 		private void PrintHeader()
 		{
-			Console.WriteLine("Welcome to the National Parks Reservation system!");
+			Console.WriteLine("Welcome To The National Parks Reservation System!");
 			Console.WriteLine();
 		}
 
@@ -410,7 +410,7 @@ namespace Capstone
 							// If departure date is earlier than arrival date
 							// OR date is earlier than today
 							// We curse the heavens
-							// And throw exception
+							// And throw exceptions
 							// (can easily change this so it blocks departure dates equal to today --
 							// but code written this way with presumption that guests are able to rent a site,
 							// without staying overnight)
