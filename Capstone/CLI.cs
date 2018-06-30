@@ -157,22 +157,29 @@ namespace Capstone
 		private void ParkSubmenuSelection()
 		{
 			const string getCampgrounds = "1";
-			const string searchForReservations = "2";
+			// FOR BONUS
+			// const string searchForReservations = "2";
 			const string returnToParks = "3";
 
-			bool getUsOutTheLoop = true;
+			bool noValidOptionSelected = true;
+
 			CampgroundCommandMenu();
 
-			while (getUsOutTheLoop == true)
+			while(noValidOptionSelected == true)
 			{
 				string command = GetUserInputString();
 
 				switch (command.ToLower())
 				{
+					default:
+						Console.WriteLine("Input not valid! Please try again.");
+						Thread.Sleep(1000);
+						ClearCurrentConsoleLine();
+						break;
+
 					case getCampgrounds:
 						GetCampgroundsByPark();
-						getUsOutTheLoop = false;
-						break;
+						return;
 
 					// BONUS FEATURE:
 					//case searchForReservations:
@@ -180,21 +187,18 @@ namespace Capstone
 					// Create method which allows park-wide reservation search
 					// Takes in arrival and departure date, returns all results for the date range
 					// (PROVIDES CAMPGROUND NAME BEFORE SITE NUMBER)
-					//  getUsOutTheLoop = false;
 					//   break;
 
 					case returnToParks:
 						Console.Clear();
 						DisplayAvailableParks();
-						getUsOutTheLoop = false;
-						break;
+						return;
 				}
-
 			}
 		}
 
 		/// <summary>
-		/// Creates list of campgrounds within park selected by user
+		/// Creates list of campgrounds within user-selected park
 		/// </summary>
 		private void GetCampgroundsByPark()
 		{
@@ -235,7 +239,6 @@ namespace Capstone
 				double dailyFee = campgrounds[i].DailyFee;
 
 				Console.WriteLine($"#{listNumber})".PadRight(6) + $"{campground}".PadRight(34) + $"{firstMonth}".PadRight(10) + $"{lastMonth}".PadRight(15) + $"{dailyFee:C2}");
-
 			}
 		}
 
@@ -249,6 +252,7 @@ namespace Capstone
 			Console.WriteLine("   1) View Campgrounds".PadLeft(4));
 			Console.WriteLine("   2) Search for Reservation".PadLeft(4));
 			Console.WriteLine("   3) Return to Previous Screen".PadLeft(4));
+			Console.WriteLine();
 		}
 
 		/// <summary>
@@ -289,15 +293,13 @@ namespace Capstone
 					Console.WriteLine("Please select a valid option!");
 					Thread.Sleep(1000);
 
-					// these two methods clean up the space
+					// Aesthetics
 					ClearCurrentConsoleLine();
 					ClearCurrentConsoleLine();
 
-					// re-assign the user input to correctly break out
+					// Retry user response
 					userInput = Console.ReadLine();
 				}
-
-
 			}
 			catch (Exception)
 			{
@@ -318,7 +320,7 @@ namespace Capstone
 
 			// Initializes integer that subs 1 from userSelection to translate selection to 0-based index
 			int campgroundSelection = userSelection - 1;
-			
+
 			// Initializes strings to hold user-input dates,
 			// Which are used to check for "0" (if user wants to cancel)
 			string temporaryArrivalDateString;
@@ -428,6 +430,7 @@ namespace Capstone
 					}
 
 					SearchForAvailableCampsites(campgrounds[campgroundSelection], arrivalDate, departureDate);
+					return;
 				}
 				catch (Exception)
 				{
@@ -436,9 +439,7 @@ namespace Capstone
 					ClearCurrentConsoleLine();
 					ClearCurrentConsoleLine();
 				}
-
 			}
-
 		}
 
 		/// <summary>
@@ -479,7 +480,7 @@ namespace Capstone
 						// We check through campsite IDs to find a hit
 						for (int i = 0; i < campsites.Count; i++)
 						{
-							if (desiredCampsite == campsites[i].SiteID)
+							if (desiredCampsite == campsites[i].SiteNumber)
 							{
 								// If a hit is found, we use that campsite as our selection
 								chosenSite = campsites[i];
@@ -587,7 +588,11 @@ namespace Capstone
 			BookReservation(startDate, endDate);
 		}
 
-
+		/// <summary>
+		/// Creates and confirms reservation
+		/// </summary>
+		/// <param name="arrivalDate">User-selected arrival date</param>
+		/// <param name="departureDate">User-selected departure date</param>
 		private void BookReservation(DateTime? arrivalDate, DateTime? departureDate)
 		{
 			int campSite = GetCampsiteToReserve();
@@ -595,15 +600,17 @@ namespace Capstone
 
 			Reservation_DAL reservationDAL = new Reservation_DAL();
 
+			// Sends off request to create reservation
 			reservationDAL.CreateReservation(campSite, name, arrivalDate, departureDate);
 
+			// Pulls ID for newest reservation
 			int reservationID = reservationDAL.RetrieveMostRecentReservation();
 
+			// Confirms our request has completed, and provides our unique reservation ID
 			Console.WriteLine($"The reservation has been made and the confirmation id is {reservationID}");
 		}
 
-
-
+		// Used briefly within CampsiteCommands to avoid repeated code
 		private void Cancel()
 		{
 			// Keep the cursor at a consistent height
@@ -612,6 +619,11 @@ namespace Capstone
 			CampsiteCommands(GetUserInputString());
 		}
 
+		/// <summary>
+		/// Translates a string of characters to a nullable DateTime object
+		/// </summary>
+		/// <param name="dateToTranslate">The string to translate</param>
+		/// <returns>A DateTime!</returns>
 		private DateTime? DateTimeTranslation(string dateToTranslate)
 		{
 			DateTime date = new DateTime();
@@ -693,7 +705,6 @@ namespace Capstone
 			string userInput = Console.ReadLine();
 			ClearCurrentConsoleLine();
 			return userInput;
-
 		}
 
 		// Sets cursor to beginning of line and rewrites line
@@ -706,7 +717,7 @@ namespace Capstone
 		}
 
 		/// <summary>
-		/// Converts boolean response to Yes/No
+		/// Translates boolean to Yes/No
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>

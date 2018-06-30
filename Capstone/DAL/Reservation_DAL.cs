@@ -36,7 +36,6 @@ namespace Capstone.Models
             }
             catch (SqlException ex)
             {
-
                 Console.WriteLine("Sorry, an error occurred: " + ex.Message);
                 throw;
             }
@@ -58,7 +57,7 @@ namespace Capstone.Models
 
                 var reader = cmd.ExecuteReader();
 
-                // don't create a new object, just read the highest value
+                // We read highest value in database
                 while (reader.Read())
                 {
                     newestReservation = Convert.ToInt32(reader);
