@@ -218,8 +218,10 @@ namespace Capstone
 			CampgroundSubMenu();
 			CampsiteCommands(GetUserInputString());
 
-			Console.WriteLine();
-		}
+            Console.WriteLine();
+
+            return;
+        }
 
 		/// <summary>
 		/// Goes through list of campgrounds, printing relevant info to console
@@ -477,6 +479,19 @@ namespace Capstone
 						// If user has entered a character representing an integer, 
 						// We parse it as our desired campsite selection
 						desiredCampsite = int.Parse(temporaryDesiredCampsite);
+
+                        if (desiredCampsite == 0)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Returning to previous menu...");
+                            Thread.Sleep(1000);
+                            Console.Clear();
+                            GetCampgroundsByPark();
+                            GetCampgroundSelection();
+
+                            // This lets us close the method if user selects 0
+                            return (int)desiredCampsite;
+                        }
 
 						// We check through campsite numbers to find a hit
 						for (int i = 0; i < campsites.Count; i++)
