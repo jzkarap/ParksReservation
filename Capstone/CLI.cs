@@ -584,6 +584,12 @@ namespace Capstone
 			Console.WriteLine("Results Matching Your Search Criteria");
 			Console.WriteLine("Site No.".PadRight(15) + "Max Occup.".PadRight(15) + "Accessible?".PadRight(15) + "Max RV Length".PadRight(20) + "Utility".PadRight(15) + "Cost");
 
+			if (campsites.Count == 0)
+			{
+				Console.WriteLine("Sorry! Looks like there are no available campsites for your date range. Please try a different campground or a new date range.");
+				return;
+			}
+
 			foreach (var site in campsites)
 			{
 				Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{BoolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{BoolChecker(site.UtilityAccess)}".PadRight(15) + $"{selectedCampground.DailyFee:c}");
