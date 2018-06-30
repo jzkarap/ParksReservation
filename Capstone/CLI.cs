@@ -62,7 +62,7 @@ namespace Capstone
 		{
 			Console.WriteLine("View Parks Interface");
 
-			string userChoice = "";
+			string userChoice = "0";
 
 			List<int> validOptions = new List<int>();
 
@@ -89,6 +89,8 @@ namespace Capstone
 					}
 					else
 					{
+						// SELECTING 4 (or, 1 more than amount in list) BREAKS THIS
+
 						// Gets index of park from parksAvailable by subtracting 1 from the user's choice
 						// (to account for 0-based index)
 						parkToDisplay = (int.Parse(userChoice) - 1);
