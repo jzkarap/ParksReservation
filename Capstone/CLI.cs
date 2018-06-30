@@ -308,16 +308,35 @@ namespace Capstone
 			}
 		}
 
+		/// <summary>
+		/// Gives us nightmares
+		/// </summary>
 		private void GetSitesAvailableForReservation()
 		{
+			// Initializes integer to represent user selection
 			int userSelection = 1;
+
+			// Initializes integer that subs 1 from userSelection to translate selection to 0-based index
+			int campgroundSelection = userSelection - 1;
+			
+			// Initializes strings to hold user-input dates,
+			// Which are used to check for "0" (if user wants to cancel)
 			string temporaryArrivalDateString;
 			string temporaryDepartureDateString;
+
+			// Initializes nullable DateTimes (thanks, Dan) to check for availability of campsite
 			DateTime? arrivalDate = null;
 			DateTime? departureDate = null;
 
+			// DURING CODE REVIEW:
+			// How to write custom exception?
+			// Would shorten having to fill out body of catch
+			// (MSDN and stackoverflow a little confusing -- what does it mean to write "innerexception"?)
 			Exception BrokenDateRange = new Exception();
 
+			// While our arrival date or departure date is null, we try to get valid input
+			// (arrival date may not be necessary to check here -- it is getting late, thoughts are fuzzy...
+			// ... was necessary at some point, but code has changed. leaving it here for now, but check during code review)
 			while (arrivalDate == null ||
 				   departureDate == null)
 			{
@@ -333,22 +352,41 @@ namespace Capstone
 						}
 					}
 
-					// both while loops validate the user's input
+					// If we have not received a responses that can be translated to an appropriate datetime, we repeat
 					while (arrivalDate == null)
 					{
-						Console.Write("What is the arrival date? (mm/dd/yyyy) ");
-						temporaryArrivalDateString = Console.ReadLine();
-
-						if (temporaryArrivalDateString == "0")
+						try
 						{
-							ClearCurrentConsoleLine();
-							Cancel();
-							break;
-						}
+							Console.Write("What is the arrival date? (mm/dd/yyyy) ");
+							temporaryArrivalDateString = Console.ReadLine();
 
-						arrivalDate = DateTimeTranslation(temporaryArrivalDateString);
+							if (temporaryArrivalDateString == "0")
+							{
+								ClearCurrentConsoleLine();
+								Cancel();
+								break;
+							}
+
+							arrivalDate = DateTimeTranslation(temporaryArrivalDateString);
+
+							// If arrival date is earlier than today,
+							// Exception is thrown
+							if (arrivalDate < DateTime.Now)
+							{
+								arrivalDate = null;
+								throw BrokenDateRange;
+							}
+						}
+						catch (Exception)
+						{
+							Console.WriteLine("Please enter a valid date range.");
+							Thread.Sleep(1000);
+							ClearCurrentConsoleLine();
+							ClearCurrentConsoleLine();
+						}
 					}
 
+					// If we have not received a responses that can be translated to an appropriate datetime, we repeat
 					while (departureDate == null)
 					{
 						try
@@ -366,7 +404,15 @@ namespace Capstone
 
 							departureDate = DateTimeTranslation(temporaryDepartureDateString);
 
-							if (departureDate < arrivalDate)
+							// If departure date is earlier than arrival date
+							// OR date is earlier than today
+							// We curse the heavens
+							// And throw exception
+							// (can easily change this so it blocks departure dates equal to today --
+							// but code written this way with presumption that guests are able to rent a site,
+							// without staying overnight)
+							if (departureDate < arrivalDate ||
+								departureDate < DateTime.Now)
 							{
 								departureDate = null;
 								throw BrokenDateRange;
@@ -379,10 +425,9 @@ namespace Capstone
 							ClearCurrentConsoleLine();
 							ClearCurrentConsoleLine();
 						}
-
 					}
 
-					SearchForAvailableCampsites(campgrounds[userSelection - 1], arrivalDate, departureDate);
+					SearchForAvailableCampsites(campgrounds[campgroundSelection], arrivalDate, departureDate);
 				}
 				catch (Exception)
 				{
