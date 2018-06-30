@@ -82,9 +82,6 @@ namespace Capstone.Models
 		// THE ABOVE METHOD DOES NOT WORK--
 		// WHY?
 
-		// ALSO: 
-		// RESERVATIONS CAN BE PLACED FOR DATES THAT OVERLAP EXISTING RESERVATIONS -- FIX
-
 		// BONUS:  Get reservations within next 30 days
 		// Returns a list of Reservations
 	}
