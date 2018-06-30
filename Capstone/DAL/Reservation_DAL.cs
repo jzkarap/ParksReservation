@@ -13,7 +13,7 @@ namespace Capstone.Models
 	public class Reservation_DAL : Master_DAL
 	{
 		private const string SQL_CreateReservation = "INSERT INTO reservation (site_id, name, from_date, to_date, create_date)  " +
-			"VALUES(@site_id, @name, @from_date, @to_date, @create_date);";
+													 "VALUES(@site_id, @name, @from_date, @to_date, @create_date);";
 
 		private const string SQL_RetrieveMostRecentReservation = "SELECT MAX(reservation_id) FROM reservation;";
 
@@ -47,6 +47,13 @@ namespace Capstone.Models
 						conn.Open();
 
 						cmd.ExecuteNonQuery();
+
+						using (SqlCommand confirmation = new SqlCommand(SQL_RetrieveMostRecentReservation, conn))
+						{
+							int newestReservation = (int)confirmation.ExecuteScalar();
+
+							Console.WriteLine($"Your reservation has been made and the confirmation id is {newestReservation}");
+						}
 					}
 				}
 			}

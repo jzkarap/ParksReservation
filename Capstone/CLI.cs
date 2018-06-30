@@ -520,7 +520,7 @@ namespace Capstone
 			Console.Write("What name should the reservation be made under? ");
 
 			string name = Console.ReadLine();
-			var regex = Regex.IsMatch(name, @"^[a-zA-Z]+$");
+			var regex = Regex.IsMatch(name, @"^[a-zA-Z +]+$");
 
 			while (!regex)
 			{
@@ -631,7 +631,6 @@ namespace Capstone
 		{
 			int campsiteID = GetCampsiteID();
 			string name = GetNameForReservation();
-			int reservationID = 0;
 
 			Reservation_DAL reservationDAL = new Reservation_DAL();
 
@@ -642,21 +641,8 @@ namespace Capstone
 			}
 			catch (Exception)
 			{
-				Console.WriteLine("Error here :(");
+				Console.WriteLine("Your reservation may or may not have been created, but the computer has decided to give you an error.");
 			}
-
-			// Pulls ID for newest reservation
-			try
-			{
-				reservationID = reservationDAL.RetrieveMostRecentReservation();
-			}
-			catch (Exception)
-			{
-				Console.WriteLine("OR IS IT HERE???");
-			}
-
-			// Confirms our request has completed, and provides our unique reservation ID
-			Console.WriteLine($"The reservation has been made and the confirmation id is {reservationID}");
 		}
 
 		// Used briefly within CampsiteCommands to avoid repeated code
