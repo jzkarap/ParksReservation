@@ -2,6 +2,7 @@
 using Capstone.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -9,70 +10,72 @@ using System.Threading.Tasks;
 
 namespace Capstone.Models
 {
-    public class Reservation_DAL : Master_DAL
-    {
-        private const string SQL_CreateReservation = "INSERT INTO (site_id, name, from_date, to_date, create_date)  " +
-            "VALUES(@site_id, @name, @from_date, @to_date, @create_date);";
+	public class Reservation_DAL : Master_DAL
+	{
+		private const string SQL_CreateReservation = "INSERT INTO reservation (site_id, name, from_date, to_date, create_date)  " +
+			"VALUES(@site_id, @name, @from_date, @to_date, @create_date);";
 
-        private const string SQL_RetrieveMostRecentReservation = "SELECT MAX(reservation_id) FROM reservation;";
+		private const string SQL_RetrieveMostRecentReservation = "SELECT MAX(reservation_id) FROM reservation;";
 
-        // Create reservation
-        public void CreateReservation(int siteID, string name, DateTime? arrivalDate, DateTime? departureDate)
-        {
-            try
-            {
-                using (var conn = new SqlConnection(dbConnectionString))
-                {
-                    conn.Open();
+		// Create reservation
+		public void CreateReservation(int siteID, string name, DateTime? arrivalDate, DateTime? departureDate)
+		{
+			try
+			{
+				using (var conn = new SqlConnection(dbConnectionString))
+				{
+					using (SqlCommand cmd = new SqlCommand(SQL_CreateReservation))
+					{
+						cmd.Parameters.AddWithValue("@site_id", siteID);
+						cmd.Parameters.AddWithValue("@name", name);
+						cmd.Parameters.Add("@from_date", SqlDbType.Date).Value = arrivalDate;
+						cmd.Parameters.Add("@to_date", SqlDbType.Date).Value = departureDate;
+						cmd.Parameters.AddWithValue("@create_date", DateTime.Now);
 
-                    var sqlCreateReservation = new SqlCommand(SQL_CreateReservation);
+						conn.Open();
 
-                    sqlCreateReservation.Parameters.AddWithValue("@site_id", siteID);
-                    sqlCreateReservation.Parameters.AddWithValue("@name", name);
-                    sqlCreateReservation.Parameters.AddWithValue("@from_date", arrivalDate);
-                    sqlCreateReservation.Parameters.AddWithValue("@to_date", departureDate);
-                    sqlCreateReservation.Parameters.AddWithValue("@create_date", DateTime.Now);
-                }
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("Sorry, an error occurred: " + ex.Message);
-                throw;
-            }
-        }
+						cmd.ExecuteNonQuery();
+					}
+				}
+			}
+			catch (SqlException)
+			{
+				Console.WriteLine("Sorry, your reservation could not be created.");
+				throw;
+			}
+		}
 
-        //  Get the most recent reservation by ID
-        public int RetrieveMostRecentReservation()
-        {
-            int newestReservation = 0;
+		//  Get the most recent reservation by ID
+		public int RetrieveMostRecentReservation()
+		{
+			int newestReservation = 0;
 
-            try
-            {
-                using (var conn = new SqlConnection(dbConnectionString))
-                {
-                    conn.Open();
-                }
+			try
+			{
+				using (var conn = new SqlConnection(dbConnectionString))
+				{
+					conn.Open();
 
-                var cmd = new SqlCommand(SQL_RetrieveMostRecentReservation);
+					SqlCommand cmd = new SqlCommand(SQL_RetrieveMostRecentReservation, conn);
 
-                var reader = cmd.ExecuteReader();
+					SqlDataReader reader = cmd.ExecuteReader();
 
-                // We read highest value in database
-                while (reader.Read())
-                {
-                    newestReservation = Convert.ToInt32(reader);
-                }
-            }
-            catch(Exception)
-            {
-                Console.WriteLine("Something went wrong");
-            }
+					while (reader.Read())
+					{
+						newestReservation = Convert.ToInt32(reader["(No column name)"]);
+					}
+				}
+			}
+			catch (Exception)
+			{
+				Console.WriteLine("Your reservation could not be retrieved.");
+			}
 
-            return newestReservation;
-        }
+			return newestReservation;
+		}
 
 
-        // BONUS:  Get reservations within next 30 days
-        // Returns a list of Reservations
-    }
+		// BONUS:  Get reservations within next 30 days
+		// Returns a list of Reservations
+	}
 }

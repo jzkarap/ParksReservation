@@ -445,7 +445,7 @@ namespace Capstone
 		/// <summary>
 		/// Collects the site to reserve
 		/// </summary>
-		private int GetCampsiteToReserve()
+		private int GetCampsiteID()
 		{
 			Console.WriteLine();
 			Console.Write("Which site should be reserved (enter 0 to cancel)? ");
@@ -477,7 +477,7 @@ namespace Capstone
 						// We parse it as our desired campsite selection
 						desiredCampsite = int.Parse(temporaryDesiredCampsite);
 
-						// We check through campsite IDs to find a hit
+						// We check through campsite numbers to find a hit
 						for (int i = 0; i < campsites.Count; i++)
 						{
 							if (desiredCampsite == campsites[i].SiteNumber)
@@ -521,14 +521,14 @@ namespace Capstone
 			string name = Console.ReadLine();
 			var regex = Regex.IsMatch(name, @"^[a-zA-Z]+$");
 
-			while (!regex)
-			{
-				Console.WriteLine("Invalid input.  Please enter a valid name.");
-				Thread.Sleep(1000);
-				ClearCurrentConsoleLine();
-				name = Console.ReadLine();
-			}
-
+				while (!regex)
+				{
+					Console.WriteLine("Invalid input.  Please enter a valid name.");
+					Thread.Sleep(1000);
+					ClearCurrentConsoleLine();
+					name = Console.ReadLine();
+				}
+			
 			return name;
 		}
 
@@ -572,6 +572,9 @@ namespace Capstone
 
 		private void SearchForAvailableCampsites(Campground selectedCampground, DateTime? startDate, DateTime? endDate)
 		{
+			// Used to get back into reservation info-getting loop if error throws us back here
+			bool trigger = false;
+
 			Campsite_DAL site_DAL = new Campsite_DAL();
 
 			campsites = site_DAL.GetCampsitesByCampground(selectedCampground.CampID, startDate, endDate);
@@ -585,7 +588,25 @@ namespace Capstone
 				Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{BoolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{BoolChecker(site.UtilityAccess)}".PadRight(15) + $"{selectedCampground.DailyFee:c}");
 			}
 
-			BookReservation(startDate, endDate);
+			while (trigger == false)
+			{
+				try
+				{
+					BookReservation(startDate, endDate);
+					trigger = true;
+					return;
+				}
+				catch (Exception)
+				{
+					ClearCurrentConsoleLine();
+					ClearCurrentConsoleLine();
+					Console.WriteLine("There was a problem with your information. Please try again.");
+					Thread.Sleep(1000);
+					ClearCurrentConsoleLine();
+					ClearCurrentConsoleLine();
+					trigger = false;
+				}
+			}
 		}
 
 		/// <summary>
@@ -595,16 +616,31 @@ namespace Capstone
 		/// <param name="departureDate">User-selected departure date</param>
 		private void BookReservation(DateTime? arrivalDate, DateTime? departureDate)
 		{
-			int campSite = GetCampsiteToReserve();
+			int campsiteID = GetCampsiteID();
 			string name = GetNameForReservation();
+			int reservationID = 0;
 
 			Reservation_DAL reservationDAL = new Reservation_DAL();
 
 			// Sends off request to create reservation
-			reservationDAL.CreateReservation(campSite, name, arrivalDate, departureDate);
+			try
+			{
+				reservationDAL.CreateReservation(campsiteID, name, arrivalDate, departureDate);
+			}
+			catch (Exception)
+			{
+				Console.WriteLine("Error here :(");
+			}
 
 			// Pulls ID for newest reservation
-			int reservationID = reservationDAL.RetrieveMostRecentReservation();
+			try
+			{
+				reservationID = reservationDAL.RetrieveMostRecentReservation();
+			}
+			catch (Exception)
+			{
+				Console.WriteLine("OR IS IT HERE???");
+			}
 
 			// Confirms our request has completed, and provides our unique reservation ID
 			Console.WriteLine($"The reservation has been made and the confirmation id is {reservationID}");
