@@ -20,16 +20,28 @@ namespace Capstone.Models
 		// Create reservation
 		public void CreateReservation(int siteID, string name, DateTime? arrivalDate, DateTime? departureDate)
 		{
+			// Converts DateTime object arrival to string
+			string arrivalConversion1 = arrivalDate.ToString();
+			// Splits DateTime object to isolate date
+			string[] arrivalConversion2 = arrivalConversion1.Split(' ');
+			// Stores ONLY date inside a variable
+			string arrivalConversion3 = arrivalConversion2[0];
+
+			// ... Ditto
+			string departureConversion1 = departureDate.ToString();
+			string[] departureConversion2 = departureConversion1.Split(' ');
+			string departureConversion3 = departureConversion2[0];
+
 			try
 			{
 				using (var conn = new SqlConnection(dbConnectionString))
 				{
-					using (SqlCommand cmd = new SqlCommand(SQL_CreateReservation))
+					using (SqlCommand cmd = new SqlCommand(SQL_CreateReservation, conn))
 					{
 						cmd.Parameters.AddWithValue("@site_id", siteID);
 						cmd.Parameters.AddWithValue("@name", name);
-						cmd.Parameters.Add("@from_date", SqlDbType.Date).Value = arrivalDate;
-						cmd.Parameters.Add("@to_date", SqlDbType.Date).Value = departureDate;
+						cmd.Parameters.Add("@from_date", SqlDbType.Date).Value = arrivalConversion3;
+						cmd.Parameters.Add("@to_date", SqlDbType.Date).Value = departureConversion3;
 						cmd.Parameters.AddWithValue("@create_date", DateTime.Now);
 
 						conn.Open();
@@ -54,16 +66,10 @@ namespace Capstone.Models
 			{
 				using (var conn = new SqlConnection(dbConnectionString))
 				{
-					conn.Open();
 
 					SqlCommand cmd = new SqlCommand(SQL_RetrieveMostRecentReservation, conn);
 
-					SqlDataReader reader = cmd.ExecuteReader();
-
-					while (reader.Read())
-					{
-						newestReservation = Convert.ToInt32(reader["(No column name)"]);
-					}
+					newestReservation = Convert.ToInt32(cmd.ExecuteScalar());
 				}
 			}
 			catch (Exception)

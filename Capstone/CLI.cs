@@ -2,6 +2,7 @@
 using Capstone.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -165,7 +166,7 @@ namespace Capstone
 
 			CampgroundCommandMenu();
 
-			while(noValidOptionSelected == true)
+			while (noValidOptionSelected == true)
 			{
 				string command = GetUserInputString();
 
@@ -359,7 +360,7 @@ namespace Capstone
 					{
 						try
 						{
-							Console.Write("What is the arrival date? (mm/dd/yyyy) ");
+							Console.Write("What is the arrival date? (yyyy/mm/dd) ");
 							temporaryArrivalDateString = Console.ReadLine();
 
 							if (temporaryArrivalDateString == "0")
@@ -393,7 +394,7 @@ namespace Capstone
 					{
 						try
 						{
-							Console.Write("What is the departure date? (mm/dd/yyyy) ");
+							Console.Write("What is the departure date? (yyyy/mm/dd) ");
 							temporaryDepartureDateString = Console.ReadLine();
 
 							if (temporaryDepartureDateString == "0")
@@ -521,14 +522,14 @@ namespace Capstone
 			string name = Console.ReadLine();
 			var regex = Regex.IsMatch(name, @"^[a-zA-Z]+$");
 
-				while (!regex)
-				{
-					Console.WriteLine("Invalid input.  Please enter a valid name.");
-					Thread.Sleep(1000);
-					ClearCurrentConsoleLine();
-					name = Console.ReadLine();
-				}
-			
+			while (!regex)
+			{
+				Console.WriteLine("Invalid input.  Please enter a valid name.");
+				Thread.Sleep(1000);
+				ClearCurrentConsoleLine();
+				name = Console.ReadLine();
+			}
+
 			return name;
 		}
 
