@@ -586,7 +586,13 @@ namespace Capstone
 
 			if (campsites.Count == 0)
 			{
+				ClearCurrentConsoleLine();
+				ClearCurrentConsoleLine();
+				Console.WriteLine();
+				Console.Clear();
 				Console.WriteLine("Sorry! Looks like there are no available campsites for your date range. Please try a different campground or a new date range.");
+				Thread.Sleep(2000);
+				GetCampgroundsByPark();
 				return;
 			}
 
