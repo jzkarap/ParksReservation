@@ -66,14 +66,17 @@ namespace Capstone
 
 			List<int> validOptions = new List<int>();
 
-			PrintParkSelection(validOptions);
+			bool validOptionSelected = false;
+
 			// Sets parkToDisplay to 0 so choice can be reselected by user through menu regression
 			parkToDisplay = 0;
 
-			while (!validOptions.Contains(parkToDisplay))
+			while (validOptionSelected == false)
 			{
 				try
 				{
+					PrintParkSelection(validOptions);
+
 					userChoice = Console.ReadLine().ToUpper();
 
 					Console.Clear();
@@ -88,8 +91,6 @@ namespace Capstone
 					}
 					else
 					{
-						// SELECTING 4 (or, 1 more than amount in list) BREAKS THIS
-
 						// Gets index of park from parksAvailable by subtracting 1 from the user's choice
 						// (to account for 0-based index)
 						parkToDisplay = (int.Parse(userChoice) - 1);
@@ -98,6 +99,7 @@ namespace Capstone
 
 						PresentParkInfo(selectedPark);
 
+						validOptionSelected = true;
 						Console.WriteLine();
 
 						return;
