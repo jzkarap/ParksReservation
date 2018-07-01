@@ -50,6 +50,7 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CampgroundDAL_Tests.cs" />
     <Compile Include="CapstoneDBTests.cs" />
     <Compile Include="CLI_Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
