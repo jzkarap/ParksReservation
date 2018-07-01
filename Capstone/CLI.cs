@@ -537,6 +537,10 @@ namespace Capstone
 			Console.Write("What name should the reservation be made under? ");
 
 			string name = Console.ReadLine();
+
+			// FOR CODE REVIEW:
+			// Why does name not get updated in the parameter here if regex is not updated
+			// within the below while loop?
 			var regex = Regex.IsMatch(name, @"^[a-zA-Z +]+$");
 
 			while (!regex)
@@ -544,7 +548,10 @@ namespace Capstone
 				Console.WriteLine("Invalid input.  Please enter a valid name.");
 				Thread.Sleep(1000);
 				ClearCurrentConsoleLine();
+				ClearCurrentConsoleLine();
+				Console.Write("What name should the reservation be made under? ");
 				name = Console.ReadLine();
+				regex = Regex.IsMatch(name, @"^[a-zA-Z +]+$");
 			}
 
 			return name;
