@@ -415,7 +415,9 @@ namespace Capstone
 
 							departureDate = DateTimeTranslation(temporaryDepartureDateString);
 
-							numberOfDaysToReserve = (departureDate - arrivalDate).Value.Days;
+							// Sets numberOfDaysToReserve to difference between arrival and departure days + 1 so that
+							// cost is calculated per day a group is on-site
+							numberOfDaysToReserve = ((departureDate - arrivalDate).Value.Days) + 1;
 
 							// If departure date is earlier than arrival date
 							// OR date is earlier than today
