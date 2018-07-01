@@ -66,6 +66,7 @@ namespace Capstone
 
 			List<int> validOptions = new List<int>();
 
+			PrintParkSelection(validOptions);
 			// Sets parkToDisplay to 0 so choice can be reselected by user through menu regression
 			parkToDisplay = 0;
 
@@ -73,8 +74,6 @@ namespace Capstone
 			{
 				try
 				{
-					PrintParkSelection(validOptions);
-
 					userChoice = Console.ReadLine().ToUpper();
 
 					Console.Clear();
@@ -220,10 +219,10 @@ namespace Capstone
 			CampgroundSubMenu();
 			CampsiteCommands(GetUserInputString());
 
-            Console.WriteLine();
+			Console.WriteLine();
 
-            return;
-        }
+			return;
+		}
 
 		/// <summary>
 		/// Goes through list of campgrounds, printing relevant info to console
@@ -323,9 +322,6 @@ namespace Capstone
 			// Initializes integer to represent user selection
 			int userSelection = 1;
 
-			// Initializes integer that subs 1 from userSelection to translate selection to 0-based index
-			int campgroundSelection = userSelection - 1;
-
 			// Initializes strings to hold user-input dates,
 			// Which are used to check for "0" (if user wants to cancel)
 			string temporaryArrivalDateString;
@@ -351,11 +347,14 @@ namespace Capstone
 				{
 					userSelection = GetCampgroundSelection();
 
+					// Initializes integer that subs 1 from userSelection to translate selection to 0-based index
+					int campgroundSelection = userSelection - 1;
+
 					{
 						if (userSelection == 0)
 						{
 							Cancel();
-							break;
+							return;
 						}
 					}
 
@@ -371,7 +370,7 @@ namespace Capstone
 							{
 								ClearCurrentConsoleLine();
 								Cancel();
-								break;
+								return;
 							}
 
 							arrivalDate = DateTimeTranslation(temporaryArrivalDateString);
@@ -406,7 +405,7 @@ namespace Capstone
 								ClearCurrentConsoleLine();
 								ClearCurrentConsoleLine();
 								Cancel();
-								break;
+								return;
 							}
 
 							departureDate = DateTimeTranslation(temporaryDepartureDateString);
@@ -482,18 +481,17 @@ namespace Capstone
 						// We parse it as our desired campsite selection
 						desiredCampsite = int.Parse(temporaryDesiredCampsite);
 
-                        if (desiredCampsite == 0)
-                        {
-                            Console.WriteLine();
-                            Console.WriteLine("Returning to previous menu...");
-                            Thread.Sleep(1000);
-                            Console.Clear();
-                            GetCampgroundsByPark();
-                            GetCampgroundSelection();
+						if (desiredCampsite == 0)
+						{
+							Console.WriteLine();
+							Console.WriteLine("Returning to previous menu...");
+							Thread.Sleep(1000);
+							Console.Clear();
+							GetCampgroundsByPark();
 
-                            // This lets us close the method if user selects 0
-                            return (int)desiredCampsite;
-                        }
+							// This lets us close the method if user selects 0
+							return (int)desiredCampsite;
+						}
 
 						// We check through campsite numbers to find a hit
 						for (int i = 0; i < campsites.Count; i++)
@@ -554,8 +552,10 @@ namespace Capstone
 		{
 			List<int> validOptions = new List<int>();
 
+			// Valid options are dependent on how many campgrounds are available
 			for (int i = 0; i < campgrounds.Count; i++)
 			{
+				// Valid options do not operate on 0-based index, so they are bumped up by 1
 				validOptions.Add(i + 1);
 			}
 
@@ -622,8 +622,8 @@ namespace Capstone
 			{
 				try
 				{
-					BookReservation(startDate, endDate);
 					trigger = true;
+					BookReservation(startDate, endDate);
 					return;
 				}
 				catch (Exception)
@@ -647,6 +647,13 @@ namespace Capstone
 		private void BookReservation(DateTime? arrivalDate, DateTime? departureDate)
 		{
 			int campsiteID = GetCampsiteID();
+
+			// If user has entered 0, exit this method
+			if (campsiteID == 0)
+			{
+				return;
+			}
+
 			string name = GetNameForReservation();
 
 			Reservation_DAL reservationDAL = new Reservation_DAL();
