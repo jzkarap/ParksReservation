@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Capstone.DAL;
 using Capstone.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,9 +13,11 @@ namespace Capstone.Tests
         public void GetCampgrounds_Test()
         {
             Campground_DAL testCampgroundDAL = new Campground_DAL();
+            Park p = new Park();
+            p.ParkID = 50;
 
             //  Stopping point:  pass the ParkID in as an argument
-            IList<Campground> testResults = testCampgroundDAL.GetCampgroundsByPark();
+            IList<Campground> testResults = testCampgroundDAL.GetCampgroundsByPark(p.ParkID);
         }
     }
 }
