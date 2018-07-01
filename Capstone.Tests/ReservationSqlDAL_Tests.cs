@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Capstone.Tests
 {
     [TestClass]
-    public class ReservationDAL_Tests : CapstoneDBTests
+    public class ReservationSqlDAL_Tests : CapstoneDBTests
     {
         private Reservation_DAL dal = new Reservation_DAL();
 
