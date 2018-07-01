@@ -339,6 +339,9 @@ namespace Capstone
 			// (MSDN and stackoverflow a little confusing -- what does it mean to write "innerexception"?)
 			Exception BrokenDateRange = new Exception();
 
+			// Initializes int that will be used to calculate cost of reservation
+			int numberOfDaysToReserve = 0;
+
 			// While our arrival date or departure date is null, we try to get valid input
 			// (arrival date may not be necessary to check here -- it is getting late, thoughts are fuzzy...
 			// ... was necessary at some point, but code has changed. leaving it here for now, but check during code review)
@@ -412,6 +415,8 @@ namespace Capstone
 
 							departureDate = DateTimeTranslation(temporaryDepartureDateString);
 
+							numberOfDaysToReserve = (departureDate - arrivalDate).Value.Days;
+
 							// If departure date is earlier than arrival date
 							// OR date is earlier than today
 							// We curse the heavens
@@ -435,7 +440,7 @@ namespace Capstone
 						}
 					}
 
-					SearchForAvailableCampsites(campgrounds[campgroundSelection], arrivalDate, departureDate);
+					SearchForAvailableCampsites(campgrounds[campgroundSelection], arrivalDate, departureDate, numberOfDaysToReserve);
 					return;
 				}
 				catch (Exception)
@@ -597,10 +602,12 @@ namespace Capstone
 			return userSelection;
 		}
 
-		private void SearchForAvailableCampsites(Campground selectedCampground, DateTime? startDate, DateTime? endDate)
+		private void SearchForAvailableCampsites(Campground selectedCampground, DateTime? startDate, DateTime? endDate, int numberOfDaysToReserve)
 		{
 			// Used to get back into reservation info-getting loop if error throws us back here
 			bool trigger = false;
+
+			double totalCost = selectedCampground.DailyFee * numberOfDaysToReserve;
 
 			Campsite_DAL site_DAL = new Campsite_DAL();
 
@@ -608,7 +615,7 @@ namespace Capstone
 
 			Console.WriteLine();
 			Console.WriteLine("Results Matching Your Search Criteria");
-			Console.WriteLine("Site No.".PadRight(15) + "Max Occup.".PadRight(15) + "Accessible?".PadRight(15) + "Max RV Length".PadRight(20) + "Utility".PadRight(15) + "Cost");
+			Console.WriteLine("Site No.".PadRight(15) + "Max Occup.".PadRight(15) + "Accessible?".PadRight(15) + "Max RV Length".PadRight(20) + "Utility".PadRight(15) + "Cost of Reservation");
 
 			if (campsites.Count == 0)
 			{
@@ -624,7 +631,7 @@ namespace Capstone
 
 			foreach (var site in campsites)
 			{
-				Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{BoolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{BoolChecker(site.UtilityAccess)}".PadRight(15) + $"{selectedCampground.DailyFee:c}");
+				Console.WriteLine($"{site.SiteNumber}".PadRight(15) + $"{site.MaxOccupancy}".PadRight(15) + $"{BoolChecker(site.Accessible)}".PadRight(15) + $"{RVChecker(site.MaxRVLength)}".PadRight(20) + $"{BoolChecker(site.UtilityAccess)}".PadRight(15) + $"{totalCost:c}");
 			}
 
 			while (trigger == false)
