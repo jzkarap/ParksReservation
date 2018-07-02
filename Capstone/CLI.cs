@@ -548,6 +548,7 @@ namespace Capstone
 			// FOR CODE REVIEW:
 			// Why does name not get updated in the parameter here if regex is not updated
 			// within the below while loop?
+			// Does it take the initial value of name, and ignore when name changes with new input?
 			var regex = Regex.IsMatch(name, @"^[a-zA-Z +]+$");
 
 			while (!regex)
