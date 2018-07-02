@@ -13,11 +13,14 @@ namespace Capstone.Tests
         public void GetCampgrounds_Test()
         {
             Campground_DAL testCampgroundDAL = new Campground_DAL();
-            Park p = new Park();
-            p.ParkID = 50;
+            Park_DAL testPark_DAL = new Park_DAL();
+            Park testPark = testPark_DAL.GetParks()[1];
 
-            //  Stopping point:  pass the ParkID in as an argument
-            IList<Campground> testResults = testCampgroundDAL.GetCampgroundsByPark(p.ParkID);
+            // use the test park's id since it's an int
+            IList<Campground> testResults = testCampgroundDAL.GetCampgroundsByPark(testPark.ParkID);
+
+            // make sure we're getting the right campground
+            Assert.AreEqual(1, testResults[0].CampID);
         }
     }
 }
