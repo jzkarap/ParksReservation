@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using Capstone.DAL;
 using Capstone.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,7 +15,6 @@ namespace Capstone.Tests
         public void CreateReservation_Test()
         {
             Reservation r = new Reservation();
-            r.ReservationID = 50;
             r.SiteID = 5;
             r.Name = "Knight Artorias";
             // This is our "From Date"
@@ -29,9 +29,30 @@ namespace Capstone.Tests
         [TestMethod]
         public void ReadReservation_Test()
         {
-            //  Retrieve the MAX(id) and returns only one row as Scalar
-            //  If it exists, the method did its job
-            Assert.IsNotNull(dal.RetrieveMostRecentReservation());
+            string SQL_RowCount = "SELECT COUNT(*) FROM reservation;";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
+                {
+                    using (SqlCommand checkRowCount = new SqlCommand(SQL_RowCount, conn))
+                    {
+                        conn.Open();
+                        int rowCount = (int) checkRowCount.ExecuteScalar();
+                        Assert.AreEqual(2, rowCount);
+
+                        dal.CreateReservation(2, "Test", DateTime.Parse("2018-10-10"), DateTime.Parse("2018-10-11"));
+
+                        rowCount = (int)checkRowCount.ExecuteScalar();
+                        Assert.AreEqual(3, rowCount);
+                    }
+                }
+            }
+            catch (SqlException)
+            {
+
+                throw;
+            }
         }
     }
 }
