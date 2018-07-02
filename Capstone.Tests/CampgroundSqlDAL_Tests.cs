@@ -13,8 +13,8 @@ namespace Capstone.Tests
         public void GetCampgrounds_Test()
         {
             Campground_DAL testCampgroundDAL = new Campground_DAL();
-            Park_DAL testPark_DAL = new Park_DAL();
-            Park testPark = testPark_DAL.GetParks()[1];
+            Park_DAL testParkDAL = new Park_DAL();
+            Park testPark = testParkDAL.GetParks()[1];
 
             // use the test park's id since it's an int
             IList<Campground> testResults = testCampgroundDAL.GetCampgroundsByPark(testPark.ParkID);
